@@ -1,0 +1,172 @@
+ Dashboard
+├── Overview
+├── KPI Dashboard
+├── Notifications
+├── Calendar
+├── Recent Activities
+
+ Master Data
+├── Organization
+├── Plants & Facilities
+├── Warehouse
+├── Storage Locations
+├── Material Master
+├── Product Master
+├── Bill of Materials (BOM)
+├── Recipes / Formulas
+├── Business Partners
+├── Vendors
+├── Customers
+├── Employees
+├── Unit of Measure (UOM)
+├── Tax Configuration
+├── Currency
+├── Batch Numbering
+├── Document Numbering
+└── System Configuration
+
+ Procurement
+├── Purchase Requisition
+├── Request for Quotation (RFQ)
+├── Vendor Quotation
+├── Quotation Comparison
+├── Purchase Order
+├── Purchase Contract
+├── Vendor Advance
+├── Purchase Invoice
+├── Debit Note
+├── Vendor Returns
+└── Procurement Dashboard
+
+ Goods Receipt
+├── Goods Receipt Note (GRN)
+├── Material Receipt
+├── Batch Creation
+├── Label Printing
+├── Barcode Generation
+├── Pending Receipts
+├── Supplier Returns
+└── Receipt Dashboard
+
+ Quality Management
+├── Incoming Quality Inspection
+├── Sampling
+├── Test Requests
+├── Test Results
+├── Certificate of Analysis (COA)
+├── In-Process Quality
+├── Final Product Quality
+├── Batch Release
+├── Stability Studies
+├── Deviations
+├── CAPA
+├── Change Control
+├── OOS / OOT
+└── Quality Dashboard
+
+ Production
+├── Production Planning
+├── Material Requirement Planning (MRP)
+├── Production Schedule
+├── Production Order
+├── Batch Manufacturing Record (BMR)
+├── Material Issue
+├── Process Execution
+├── In-Process Inspection
+├── Machine Allocation
+├── Equipment Cleaning
+├── Line Clearance
+├── Batch Packaging Record (BPR)
+├── Yield Calculation
+├── Production Completion
+├── Rework
+├── Scrap Management
+├── Batch Closure
+└── Production Dashboard
+
+ Warehouse
+├── Raw Material Inventory
+├── WIP Inventory
+├── Finished Goods Inventory
+├── Batch Management
+├── Bin Management
+├── Stock Transfer
+├── Stock Adjustment
+├── Cycle Count
+├── Physical Stock Verification
+├── Inventory Valuation
+├── Expiry Management
+├── Near Expiry Stock
+└── Warehouse Dashboard
+
+ Finished Goods
+├── Finished Goods Receipt
+├── Product Release
+├── Labeling & Coding
+├── Serialization
+├── Palletization
+├── Batch Traceability
+├── Finished Goods Transfer
+├── Hold / Release
+└── Finished Goods Dashboard
+
+ Sales & Dispatch
+├── Sales Order
+├── Delivery Order
+├── Pick List
+├── Packing
+├── Shipment
+├── Invoice
+├── Customer Returns
+├── Logistics Tracking
+├── Dispatch Register
+└── Dispatch Dashboard
+
+ Reports & Analytics
+├── Executive Dashboard
+├── Inventory Reports
+├── Procurement Reports
+├── Production Reports
+├── Quality Reports
+├── Warehouse Reports
+├── Dispatch Reports
+├── Batch Traceability
+├── Expiry Reports
+├── Audit Reports
+├── User Activity
+└── Custom Reports
+
+ Workflow & Approvals
+├── Approval Inbox
+├── Pending Approvals
+├── Workflow Designer
+├── Escalation Rules
+├── Email Notifications
+└── Approval History
+
+ Compliance
+├── Audit Trail
+├── Electronic Signatures
+├── Document Management
+├── SOP Management
+├── Validation Documents
+├── Regulatory Compliance
+├── Recall Management
+└── Compliance Dashboard
+
+ Administration
+├── User Management
+├── Roles & Permissions
+├── Menu Access
+├── Approval Matrix
+├── Organization Settings
+├── Fiscal Year
+├── Number Series
+├── Email Templates
+├── Notification Settings
+├── Backup & Restore
+├── Audit Logs
+├── API Integration
+├── Import / Export
+├── System Health
+└── Application Settings

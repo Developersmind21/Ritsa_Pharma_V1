@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHARMA ERP - Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0B1B3D;
+    --navy-2:#101F45;
+    --blue:#2563EB;
+    --blue-dark:#1E4FD6;
+    --page-bg:#F5F7FA;
+    --text-dark:#1F2937;
+    --text-gray:#6B7280;
+    --text-gray-light:#9CA3AF;
+    --border:#EEF1F5;
+    --green:#16A34A;
+    --red:#DC2626;
+    --purple:#7C3AED;
+    --orange:#F59E0B;
+    --teal:#0D9488;
+    --shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--page-bg);
+    color:var(--text-dark);
+    margin:0;
+    overflow-x:hidden;
+  }
+  a{text-decoration:none;}
+
+  /* ============ TOP NAVBAR ============ */
+  .topnav{
+    height:64px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    padding:0;
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:1000;
+    gap:14px;
+  }
+  .hamburger-btn{
+    background:none;border:none;color:var(--text-dark);font-size:1.15rem;cursor:pointer;
+    padding:5px;display:none;
+  }
+  .side-icon-wrap{
+    width:88px;height:64px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--navy);
+    padding:8px;
+  }
+  .side-icon-wrap img, .side-icon-wrap svg{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block;}
+  .hamburger-svg{width:26px !important;height:26px !important;max-width:26px !important;max-height:26px !important;}
+  .brand-logo{
+    width:80px;height:80px;border-radius:0;
+    background:transparent;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;overflow:hidden;padding:0;
+    margin-left:0px;
+    margin-top:-8px;
+    margin-bottom:-8px;
+  }
+  .brand-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+  .brand-text-block{line-height:1.1;}
+  .brand-title{font-weight:800;color:var(--navy);font-size:0.95rem;letter-spacing:0.3px;}
+  .brand-sub{font-size:0.62rem;color:var(--text-gray);font-weight:500;}
+
+  .nav-spacer{flex:1;padding-right:18px;}
+
+  .nav-icon-item{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    position:relative;cursor:pointer;color:var(--text-dark);min-width:44px;
+  }
+  .nav-icon-item i{font-size:0.98rem;color:#4B5563;}
+  .nav-icon-item > span{font-size:0.58rem;color:var(--text-gray);font-weight:500;}
+  .nav-badge{
+    position:absolute;top:-4px;right:6px;
+    background:var(--red);color:#fff !important;
+    font-size:0.68rem;font-weight:700;
+    min-width:16px;height:16px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    padding:0 4px;line-height:1;
+  }
+
+  .profile-block{
+    display:flex;align-items:center;gap:8px;cursor:pointer;padding-left:12px;
+    border-left:1px solid var(--border);margin-left:4px;
+    position:relative;
+  }
+  .profile-avatar{
+    width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;overflow:hidden;
+  }
+  .profile-avatar svg{width:100%;height:100%;display:block;}
+  .profile-name{font-size:0.76rem;font-weight:700;color:var(--text-dark);line-height:1.15;}
+  .profile-role{font-size:0.62rem;color:var(--text-gray);line-height:1.15;}
+
+  .profile-dropdown{
+    position:absolute;
+    top:calc(100% + 10px);
+    right:0;
+    width:190px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);
+    padding:6px;
+    display:none;
+    flex-direction:column;
+    z-index:1100;
+  }
+  .profile-dropdown.open{display:flex;}
+  .profile-dd-item{
+    display:flex;align-items:center;gap:9px;
+    padding:8px 10px;border-radius:7px;
+    font-size:0.78rem;font-weight:500;color:var(--text-dark);
+  }
+  .profile-dd-item i{font-size:0.9rem;color:var(--text-gray);width:16px;}
+  .profile-dd-item:hover{background:var(--page-bg);}
+  .profile-dd-divider{height:1px;background:var(--border);margin:5px 2px;}
+  .profile-dd-danger{color:var(--red);}
+  .profile-dd-danger i{color:var(--red);}
+
+  /* ============ LEFT ICON SIDEBAR ============ */
+  .icon-sidebar{
+    position:fixed;
+    top:0;bottom:0;left:0;
+    width:88px;
+    background:var(--navy);
+    display:flex;flex-direction:column;
+    align-items:stretch;
+    padding-top:68px;
+    padding-bottom:0;
+    z-index:905;
+    overflow:hidden;
+  }
+  .sb-item{
+    flex:0 0 auto;
+    min-height:50px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;
+    padding:5px 4px;
+    color:#AEB8D6;
+    cursor:pointer;
+    text-align:center;
+    position:relative;
+  }
+  .sb-item i{font-size:1.05rem;}
+  .sb-item span{font-size:0.6rem;font-weight:600;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;hyphens:auto;padding:0 2px;width:100%;}
+  .sb-item:hover{color:#fff;}
+  .sb-item.active{
+    color:#fff;
+  }
+  .sb-item.active::before{
+    content:"";
+    position:absolute;
+    left:0;top:4px;bottom:4px;
+    width:3px;
+    background:var(--blue);
+    border-radius:0 4px 4px 0;
+  }
+  .sb-item.active .sb-icon-wrap{
+    background:var(--blue);
+    border-radius:8px;
+  }
+  .sb-icon-wrap{
+    width:30px;height:26px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:8px;
+  }
+  .sb-collapse-row{
+    margin-top:auto;
+    padding:6px 0 4px;
+    color:#AEB8D6;
+    cursor:pointer;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    display:none;
+  }
+  .sb-collapse-row:hover{color:#fff;}
+
+  /* ============ MASTERS FLYOUT ============ */
+  .masters-panel{
+    position:fixed;
+    top:64px;
+    bottom:0;
+    left:88px;
+    width:180px;
+    background:#fff;
+    border-right:1px solid var(--border);
+    box-shadow:3px 4px 18px rgba(15,23,42,0.08);
+    z-index:850;
+    display:flex;flex-direction:column;
+    transform:translateX(0);
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition:none;
+  }
+  .masters-panel.open{
+    transform:translateX(0);
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .masters-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 12px 8px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:4px;
+  }
+  .masters-header h6{margin:0;font-weight:800;font-size:0.8rem;color:var(--text-dark);}
+  .masters-close{background:none;border:none;color:var(--text-gray);font-size:0.85rem;cursor:pointer;}
+  .masters-list{overflow:visible;padding:4px 0 10px;flex:1 1 auto;}
+  .masters-item{
+    display:flex;align-items:flex-start;gap:9px;
+    padding:8px 12px;
+    color:var(--text-dark);
+    font-size:0.7rem;font-weight:500;
+    cursor:pointer;
+    overflow:hidden;
+  }
+  .masters-item span,.masters-item .label{
+    white-space:normal;overflow:visible;text-overflow:clip;flex:1;min-width:0;
+    word-break:break-word;line-height:1.3;display:block;
+  }
+  .masters-item:hover{background:#F8FAFC;}
+  .masters-icon{
+    width:23px;height:23px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.72rem;flex-shrink:0;
+  }
+  .masters-item .chev{margin-left:auto;color:var(--text-gray-light);font-size:0.66rem;flex-shrink:0;margin-top:2px;}
+
+  /* ============ MAIN CONTENT ============ */
+  .main-content{
+    margin-left:268px;
+    margin-right:0;
+    margin-top:64px;
+    padding:14px 20px 16px;
+    min-height:calc(100vh - 64px);
+    transition:none;
+  }
+  .main-content.panel-open{margin-left:268px;}
+
+  .greet-row{
+    display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:10px;
+  }
+  .greet-sub{font-size:0.76rem;color:var(--text-gray);margin-bottom:2px;}
+  .greet-title{font-size:1.3rem;font-weight:800;color:var(--text-dark);margin-bottom:2px;}
+  .greet-desc{font-size:0.76rem;color:var(--text-gray);}
+  .btn-customize{
+    background:var(--blue);border:none;color:#fff;font-weight:600;font-size:0.76rem;
+    padding:7px 14px;border-radius:8px;display:flex;align-items:center;gap:6px;
+  }
+  .btn-customize:hover{background:var(--blue-dark);color:#fff;}
+
+  .card-base{
+    background:#fff;border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);
+  }
+
+  /* Stat cards */
+  .stat-card{
+    padding:14px;display:flex;align-items:center;gap:11px;
+  }
+  .stat-icon{
+    width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.05rem;color:#fff;flex-shrink:0;
+  }
+  .stat-label{font-size:0.7rem;color:var(--text-dark);font-weight:700;margin-bottom:2px;}
+  .stat-value{font-size:1.25rem;font-weight:800;color:var(--text-dark);line-height:1.2;}
+  .stat-foot{display:flex;align-items:center;gap:7px;margin-top:3px;font-size:0.66rem;}
+  .stat-foot .sub{color:var(--text-gray);}
+  .stat-foot .up{color:var(--green);font-weight:700;}
+  .stat-foot .down{color:var(--red);font-weight:700;}
+
+  /* chart cards */
+  .chart-card{padding:14px;}
+  .chart-card-title{font-weight:700;font-size:0.86rem;color:var(--text-dark);}
+  .filter-dd{
+    font-size:0.68rem;color:var(--text-dark);font-weight:500;
+    background:var(--page-bg);border:1px solid var(--border);
+    padding:5px 10px;border-radius:7px;display:flex;align-items:center;gap:5px;
+  }
+  .legend-row{display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--text-gray);}
+  .legend-dot{width:9px;height:9px;border-radius:3px;display:inline-block;}
+
+  .donut-legend-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:5px 0;font-size:0.7rem;
+  }
+  .donut-legend-left{display:flex;align-items:center;gap:7px;color:var(--text-dark);font-weight:500;}
+  .donut-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .donut-legend-pct{color:var(--text-dark);font-weight:700;margin-right:5px;}
+  .donut-legend-num{color:var(--text-gray);}
+
+  /* Table card */
+  .table-card{padding:14px;}
+  .table-card-title{font-weight:700;font-size:0.86rem;color:var(--text-dark);margin-bottom:10px;}
+  .po-table{width:100%;font-size:0.72rem;border-collapse:collapse;}
+  .po-table thead th{
+    text-align:left;color:var(--text-gray);font-weight:600;font-size:0.65rem;
+    text-transform:none;padding:6px 5px;border-bottom:1px solid var(--border);
+  }
+  .po-table tbody td{
+    padding:9px 5px;border-bottom:1px solid var(--border);color:var(--text-dark);vertical-align:middle;
+  }
+  .po-table tbody tr:last-child td{border-bottom:none;}
+  .status-pill{
+    font-size:0.63rem;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-block;white-space:nowrap;
+  }
+  .status-inprogress{background:#DBEAFE;color:#1D4ED8;}
+  .status-completed{background:#DCFCE7;color:#15803D;}
+  .status-planned{background:#F1F5F9;color:#64748B;}
+  .prog-bar-wrap{display:flex;align-items:center;gap:7px;min-width:100px;}
+  .prog-bar-wrap .progress{height:5px;flex:1;background:#EEF1F5;}
+  .prog-pct{font-size:0.66rem;color:var(--text-gray);font-weight:600;width:28px;}
+
+  .view-all-link{font-size:0.72rem;font-weight:600;color:var(--blue);}
+
+  /* Recent activities */
+  .activity-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .activity-item:last-of-type{border-bottom:none;}
+  .activity-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:5px;flex-shrink:0;}
+  .activity-title{font-weight:700;font-size:0.74rem;color:var(--text-dark);}
+  .activity-sub{font-size:0.68rem;color:var(--text-gray);margin-top:1px;}
+  .activity-time{font-size:0.64rem;color:var(--text-gray-light);white-space:nowrap;margin-left:auto;flex-shrink:0;}
+  .activity-row{display:flex;width:100%;}
+  .activity-body{flex:1;}
+
+  /* utility icon bg colors */
+  .bg-blue-soft{background:#2563EB;}
+  .bg-green-soft{background:#16A34A;}
+  .bg-purple-soft{background:#7C3AED;}
+  .bg-orange-soft{background:#F59E0B;}
+
+  /* responsive */
+  @media (max-width: 991px){
+    .masters-panel{transform:translateX(-12px);opacity:0;visibility:hidden;pointer-events:none;}
+    .masters-panel.open{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto;}
+    .main-content{margin-left:88px;}
+    .main-content.panel-open{margin-left:268px;}
+  }
+  @media (max-width: 767px){
+    .icon-sidebar{display:none;}
+    .side-icon-wrap{display:none;}
+    .main-content{margin-left:0;padding:14px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="topnav">
+  <div class="side-icon-wrap">
+    <svg class="hamburger-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
+      <line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="brand-logo">
+    <img src="assets/image (21).png" alt="Pharma ERP Logo">
+  </div>
+  <!-- <div class="brand-text-block">
+    <div class="brand-title">PHARMA ERP</div>
+    <div class="brand-sub">Complete Pharma Business Suite</div>
+  </div> -->
+
+  <div class="nav-spacer"></div>
+
+  <div class="d-flex align-items-center gap-1">
+    <div class="nav-icon-item">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-icon-item">
+      <i class="bi bi-question-circle"></i>
+      <span>Help</span>
+    </div>
+  </div>
+
+  <div class="profile-block" id="profileBlock">
+    <div class="profile-avatar" aria-label="Shailendra Singh">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="paBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#DBEAFE"/>
+            <stop offset="100%" stop-color="#93C5FD"/>
+          </linearGradient>
+        </defs>
+        <!-- background circle -->
+        <circle cx="16" cy="16" r="16" fill="url(#paBg)"/>
+        <!-- person silhouette: head -->
+        <circle cx="16" cy="12" r="5" fill="#1E40AF"/>
+        <!-- person silhouette: shoulders -->
+        <path d="M5 28 C 5 22, 9.5 19, 16 19 C 22.5 19, 27 22, 27 28 L 27 32 L 5 32 Z" fill="#1E40AF"/>
+      </svg>
+    </div>
+    <div>
+      <div class="profile-name">Shailendra Singh</div>
+      <div class="profile-role">Chief Operating Officer</div>
+    </div>
+    <i class="bi bi-chevron-down" style="font-size:0.7rem;color:var(--text-gray);"></i>
+
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="#" class="profile-dd-item"><i class="bi bi-person-circle"></i> My Account</a>
+      <!-- <a href="#" class="profile-dd-item"><i class="bi bi-gear"></i> Settings</a> -->
+      <div class="profile-dd-divider"></div>
+      <a href="#" class="profile-dd-item profile-dd-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- LEFT ICON SIDEBAR -->
+<div class="icon-sidebar" id="iconSidebar">
+  <div class="sb-item active" data-menu="dashboard">
+    <div class="sb-icon-wrap"><i class="bi bi-house-door-fill"></i></div>
+    <span>Dashboard</span>
+  </div>
+  <div class="sb-item" data-menu="masterdata">
+    <div class="sb-icon-wrap"><i class="bi bi-diagram-3"></i></div>
+    <span>Master Data</span>
+  </div>
+  <div class="sb-item" data-menu="purchasing">
+    <div class="sb-icon-wrap"><i class="bi bi-cart3"></i></div>
+    <span>Procurement</span>
+  </div>
+  <div class="sb-item" data-menu="goodsreceipt">
+    <div class="sb-icon-wrap"><i class="bi bi-box-arrow-in-down"></i></div>
+    <span>Goods Receipt</span>
+  </div>
+  <div class="sb-item" data-menu="qualitymgmt">
+    <div class="sb-icon-wrap"><i class="bi bi-patch-check"></i></div>
+    <span>Quality Mgmt</span>
+  </div>
+  <div class="sb-item" data-menu="production">
+    <div class="sb-icon-wrap"><i class="bi bi-gear-wide-connected"></i></div>
+    <span>Production</span>
+  </div>
+  <div class="sb-item" data-menu="warehouse">
+    <div class="sb-icon-wrap"><i class="bi bi-building"></i></div>
+    <span>Warehouse</span>
+  </div>
+  <div class="sb-item" data-menu="finishedgoods">
+    <div class="sb-icon-wrap"><i class="bi bi-box-seam"></i></div>
+    <span>Finished Goods</span>
+  </div>
+  <div class="sb-item" data-menu="salesdispatch">
+    <div class="sb-icon-wrap"><i class="bi bi-truck"></i></div>
+    <span>Sales &amp; Dispatch</span>
+  </div>
+  <div class="sb-item" data-menu="reports">
+    <div class="sb-icon-wrap"><i class="bi bi-bar-chart-line"></i></div>
+    <span>Reports</span>
+  </div>
+  <div class="sb-item" data-menu="workflow">
+    <div class="sb-icon-wrap"><i class="bi bi-diagram-2"></i></div>
+    <span>Workflow</span>
+  </div>
+  <div class="sb-item" data-menu="compliance">
+    <div class="sb-icon-wrap"><i class="bi bi-shield-check"></i></div>
+    <span>Compliance</span>
+  </div>
+  <div class="sb-item" data-menu="admin">
+    <div class="sb-icon-wrap"><i class="bi bi-person-gear"></i></div>
+    <span>Administration</span>
+  </div>
+
+  <div class="sb-collapse-row" id="sbCollapseBtn">
+    <i class="bi bi-chevron-double-left"></i>
+  </div>
+</div>
+
+<!-- SUBMENU FLYOUT (populated dynamically per main menu) -->
+<div class="masters-panel open" id="mastersPanel">
+  <div class="masters-header">
+    <h6 id="panelTitle">Dashboard</h6>
+  </div>
+  <div class="masters-list" id="panelList"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+
+  <div class="greet-row">
+    <div>
+      <div class="greet-sub">Welcome back, John Doe!</div>
+      <div class="greet-title">Dashboard</div>
+      <div class="greet-desc">Here's what's happening in your business today.</div>
+    </div>
+    <!-- <button class="btn-customize">Customize Dashboard <i class="bi bi-chevron-down"></i></button> -->
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3">
+      <div class="card-base stat-card h-100">
+        <div class="stat-icon bg-blue-soft"><i class="bi bi-box-fill"></i></div>
+        <div>
+          <div class="stat-label">Total Materials</div>
+          <div class="stat-value">1,248</div>
+          <div class="stat-foot"><span class="sub">Active Materials</span> <span class="up"><i class="bi bi-arrow-up"></i> 8.5%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card-base stat-card h-100">
+        <div class="stat-icon bg-green-soft"><i class="bi bi-gear-wide-connected"></i></div>
+        <div>
+          <div class="stat-label">Production Orders</div>
+          <div class="stat-value">156</div>
+          <div class="stat-foot"><span class="sub">In Progress</span> <span class="up"><i class="bi bi-arrow-up"></i> 12.3%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card-base stat-card h-100">
+        <div class="stat-icon bg-purple-soft"><i class="bi bi-eyedropper"></i></div>
+        <div>
+          <div class="stat-label">QC Samples</div>
+          <div class="stat-value">328</div>
+          <div class="stat-foot"><span class="sub">Pending Results</span> <span class="down"><i class="bi bi-arrow-down"></i> 5.2%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="card-base stat-card h-100">
+        <div class="stat-icon bg-orange-soft"><i class="bi bi-truck"></i></div>
+        <div>
+          <div class="stat-label">Dispatches</div>
+          <div class="stat-value">246</div>
+          <div class="stat-foot"><span class="sub">Today</span> <span class="up"><i class="bi bi-arrow-up"></i> 15.8%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART ROW -->
+  <div class="row g-3 mb-3">
+    <div class="col-lg-6">
+      <div class="card-base chart-card h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="chart-card-title">Production Vs Target</div>
+          <div class="filter-dd">This Month <i class="bi bi-chevron-down"></i></div>
+        </div>
+        <div style="height:150px;position:relative;">
+          <canvas id="prodTargetChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-base chart-card h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="chart-card-title">Inventory Overview</div>
+          <div class="filter-dd">This Month <i class="bi bi-chevron-down"></i></div>
+        </div>
+        <div class="d-flex align-items-center">
+          <div style="width:130px;height:130px;position:relative;flex-shrink:0;">
+            <canvas id="inventoryDonut"></canvas>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:0.62rem;color:var(--text-gray);">Total</div>
+              <div style="font-size:1rem;font-weight:800;color:var(--text-dark);">2,450</div>
+            </div>
+          </div>
+          <div class="flex-grow-1 ps-3">
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><span class="donut-legend-dot" style="background:#2563EB;"></span>Raw Materials</div>
+              <div><span class="donut-legend-pct">35%</span><span class="donut-legend-num">(858)</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><span class="donut-legend-dot" style="background:#16A34A;"></span>Packaging Materials</div>
+              <div><span class="donut-legend-pct">20%</span><span class="donut-legend-num">(490)</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><span class="donut-legend-dot" style="background:#7C3AED;"></span>Finished Goods</div>
+              <div><span class="donut-legend-pct">25%</span><span class="donut-legend-num">(613)</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><span class="donut-legend-dot" style="background:#F59E0B;"></span>Semi Finished</div>
+              <div><span class="donut-legend-pct">10%</span><span class="donut-legend-num">(245)</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><span class="donut-legend-dot" style="background:#0D9488;"></span>Others</div>
+              <div><span class="donut-legend-pct">10%</span><span class="donut-legend-num">(244)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card-base table-card h-100">
+        <div class="table-card-title">Recent Production Orders</div>
+        <div class="table-responsive">
+        <table class="po-table">
+          <thead>
+            <tr>
+              <th>Order No.</th><th>Product</th><th>Batch No.</th><th>Planned Date</th><th>Status</th><th>Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PO-2024-00156</td><td>Paracetamol 500mg</td><td>B240601</td><td>01-Jun-2024</td>
+              <td><span class="status-pill status-inprogress">In Progress</span></td>
+              <td><div class="prog-bar-wrap"><div class="progress"><div class="progress-bar" style="width:65%;background:#2563EB;"></div></div><span class="prog-pct">65%</span></div></td>
+            </tr>
+            <tr>
+              <td>PO-2024-00155</td><td>Amoxicillin 250mg</td><td>B240602</td><td>01-Jun-2024</td>
+              <td><span class="status-pill status-inprogress">In Progress</span></td>
+              <td><div class="prog-bar-wrap"><div class="progress"><div class="progress-bar" style="width:40%;background:#2563EB;"></div></div><span class="prog-pct">40%</span></div></td>
+            </tr>
+            <tr>
+              <td>PO-2024-00154</td><td>Cetirizine 10mg</td><td>B240603</td><td>31-May-2024</td>
+              <td><span class="status-pill status-completed">Completed</span></td>
+              <td><div class="prog-bar-wrap"><div class="progress"><div class="progress-bar" style="width:100%;background:#16A34A;"></div></div><span class="prog-pct">100%</span></div></td>
+            </tr>
+            <tr>
+              <td>PO-2024-00153</td><td>Ibuprofen 400mg</td><td>B240604</td><td>31-May-2024</td>
+              <td><span class="status-pill status-inprogress">In Progress</span></td>
+              <td><div class="prog-bar-wrap"><div class="progress"><div class="progress-bar" style="width:75%;background:#2563EB;"></div></div><span class="prog-pct">75%</span></div></td>
+            </tr>
+            <tr>
+              <td>PO-2024-00152</td><td>Omeprazole 20mg</td><td>B240605</td><td>30-May-2024</td>
+              <td><span class="status-pill status-planned">Planned</span></td>
+              <td><div class="prog-bar-wrap"><div class="progress"><div class="progress-bar" style="width:0%;background:#94A3B8;"></div></div><span class="prog-pct">0%</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="text-center mt-2"><a href="#" class="view-all-link">View All Orders</a></div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card-base table-card h-100">
+        <div class="table-card-title">Recent Activities</div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-row">
+            <div class="activity-body">
+              <div class="activity-title">QC Result Approved for Batch B240601</div>
+              <div class="activity-sub">Paracetamol 500mg</div>
+            </div>
+            <div class="activity-time">10:30 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-row">
+            <div class="activity-body">
+              <div class="activity-title">GRN Created for PO-2024-00125</div>
+              <div class="activity-sub">Supplier: MedChem Laboratories</div>
+            </div>
+            <div class="activity-time">09:45 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-row">
+            <div class="activity-body">
+              <div class="activity-title">Production Order Started: PO-2024-00156</div>
+              <div class="activity-sub">Batch B240601</div>
+            </div>
+            <div class="activity-time">09:15 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-row">
+            <div class="activity-body">
+              <div class="activity-title">Material Issued to Production</div>
+              <div class="activity-sub">Paracetamol IP - 500 KG</div>
+            </div>
+            <div class="activity-time">08:50 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div class="activity-row">
+            <div class="activity-body">
+              <div class="activity-title">Dispatch Completed: INV-2024-00521</div>
+              <div class="activity-sub">Customer: Apollo Hospitals</div>
+            </div>
+            <div class="activity-time">08:20 AM</div>
+          </div>
+        </div>
+        <div class="text-center mt-2"><a href="#" class="view-all-link">View All Activities</a></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER (removed) -->
+
+<script>
+  // ============ SIDEBAR MENU + DYNAMIC SUBMENU DATA ============
+  const menuData = {
+    dashboard: {
+      title: 'Dashboard', bg:'#DBEAFE', color:'#2563EB',
+      items: [
+        { name:'Overview', icon:'bi-speedometer2' },
+        { name:'KPI Dashboard', icon:'bi-bar-chart-line' },
+        { name:'Notifications', icon:'bi-bell' },
+        { name:'Calendar', icon:'bi-calendar3' },
+        { name:'Recent Activities', icon:'bi-activity' }
+      ]
+    },
+    masterdata: {
+      title: 'Master Data', bg:'#DBEAFE', color:'#2563EB',
+      items: [
+        { name:'Organization', icon:'bi-building' },
+        { name:'Plants & Facilities', icon:'bi-houses' },
+        { name:'Warehouse', icon:'bi-house-gear' },
+        { name:'Storage Locations', icon:'bi-geo-alt' },
+        { name:'Material Master', icon:'bi-box-seam' },
+        { name:'Product Master', icon:'bi-box' },
+        { name:'Bill of Materials (BOM)', icon:'bi-diagram-3' },
+        { name:'Recipes / Formulas', icon:'bi-journal-text' },
+        { name:'Business Partners', icon:'bi-people' },
+        { name:'Vendors', icon:'bi-truck-front' },
+        { name:'Customers', icon:'bi-person-badge' },
+        { name:'Employees', icon:'bi-person-vcard' },
+        { name:'Unit of Measure (UOM)', icon:'bi-rulers' },
+        { name:'Tax Configuration', icon:'bi-percent' },
+        { name:'Currency', icon:'bi-coin' },
+        { name:'Batch Numbering', icon:'bi-hash' },
+        { name:'Document Numbering', icon:'bi-file-earmark-number' },
+        { name:'System Configuration', icon:'bi-sliders' }
+      ]
+    },
+    purchasing: {
+      title: 'Procurement', bg:'#FFEDD5', color:'#F59E0B',
+      items: [
+        { name:'Purchase Requisition', icon:'bi-file-earmark-text' },
+        { name:'Request for Quotation (RFQ)', icon:'bi-file-earmark-ruled' },
+        { name:'Vendor Quotation', icon:'bi-file-earmark-quote' },
+        { name:'Quotation Comparison', icon:'bi-bar-chart-steps' },
+        { name:'Purchase Order', icon:'bi-receipt' },
+        { name:'Purchase Contract', icon:'bi-file-earmark-lock' },
+        { name:'Vendor Advance', icon:'bi-cash-stack' },
+        { name:'Purchase Invoice', icon:'bi-file-earmark-invoice' },
+        { name:'Debit Note', icon:'bi-file-earmark-minus' },
+        { name:'Vendor Returns', icon:'bi-arrow-return-left' },
+        { name:'Procurement Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    goodsreceipt: {
+      title: 'Goods Receipt', bg:'#DCFCE7', color:'#16A34A',
+      items: [
+        { name:'Goods Receipt Note (GRN)', icon:'bi-box-arrow-in-down' },
+        { name:'Material Receipt', icon:'bi-truck' },
+        { name:'Batch Creation', icon:'bi-collection' },
+        { name:'Label Printing', icon:'bi-tag' },
+        { name:'Barcode Generation', icon:'bi-upc-scan' },
+        { name:'Pending Receipts', icon:'bi-hourglass-split' },
+        { name:'Supplier Returns', icon:'bi-arrow-return-left' },
+        { name:'Receipt Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    qualitymgmt: {
+      title: 'Quality Management', bg:'#FEE2E2', color:'#DC2626',
+      items: [
+        { name:'Incoming Quality Inspection', icon:'bi-search' },
+        { name:'Sampling', icon:'bi-eyedropper' },
+        { name:'Test Requests', icon:'bi-clipboard-check' },
+        { name:'Test Results', icon:'bi-clipboard-data' },
+        { name:'Certificate of Analysis (COA)', icon:'bi-file-earmark-medical' },
+        { name:'In-Process Quality', icon:'bi-activity' },
+        { name:'Final Product Quality', icon:'bi-patch-check' },
+        { name:'Batch Release', icon:'bi-unlock' },
+        { name:'Stability Studies', icon:'bi-graph-up' },
+        { name:'Deviations', icon:'bi-exclamation-triangle' },
+        { name:'CAPA', icon:'bi-shield-check' },
+        { name:'Change Control', icon:'bi-arrow-repeat' },
+        { name:'OOS / OOT', icon:'bi-exclamation-octagon' },
+        { name:'Quality Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    production: {
+      title: 'Production', bg:'#E0E7FF', color:'#4338CA',
+      items: [
+        { name:'Production Planning', icon:'bi-clipboard2-check' },
+        { name:'Material Requirement Planning (MRP)', icon:'bi-list-check' },
+        { name:'Production Schedule', icon:'bi-calendar3' },
+        { name:'Production Order', icon:'bi-receipt-cutoff' },
+        { name:'Batch Manufacturing Record (BMR)', icon:'bi-journal-richtext' },
+        { name:'Material Issue', icon:'bi-box-arrow-up' },
+        { name:'Process Execution', icon:'bi-gear-wide-connected' },
+        { name:'In-Process Inspection', icon:'bi-search' },
+        { name:'Machine Allocation', icon:'bi-cpu' },
+        { name:'Equipment Cleaning', icon:'bi-droplet' },
+        { name:'Line Clearance', icon:'bi-check2-square' },
+        { name:'Batch Packaging Record (BPR)', icon:'bi-box-seam' },
+        { name:'Yield Calculation', icon:'bi-calculator' },
+        { name:'Production Completion', icon:'bi-check-circle' },
+        { name:'Rework', icon:'bi-arrow-counterclockwise' },
+        { name:'Scrap Management', icon:'bi-trash3' },
+        { name:'Batch Closure', icon:'bi-archive' },
+        { name:'Production Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    warehouse: {
+      title: 'Warehouse', bg:'#CFFAFE', color:'#0D9488',
+      items: [
+        { name:'Raw Material Inventory', icon:'bi-boxes' },
+        { name:'WIP Inventory', icon:'bi-hourglass-split' },
+        { name:'Finished Goods Inventory', icon:'bi-box-seam' },
+        { name:'Batch Management', icon:'bi-collection' },
+        { name:'Bin Management', icon:'bi-grid-3x3-gap' },
+        { name:'Stock Transfer', icon:'bi-arrow-left-right' },
+        { name:'Stock Adjustment', icon:'bi-sliders2' },
+        { name:'Cycle Count', icon:'bi-calculator' },
+        { name:'Physical Stock Verification', icon:'bi-clipboard-check' },
+        { name:'Inventory Valuation', icon:'bi-currency-dollar' },
+        { name:'Expiry Management', icon:'bi-calendar-x' },
+        { name:'Near Expiry Stock', icon:'bi-exclamation-diamond' },
+        { name:'Warehouse Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    finishedgoods: {
+      title: 'Finished Goods', bg:'#FEF3C7', color:'#B45309',
+      items: [
+        { name:'Finished Goods Receipt', icon:'bi-box-arrow-in-down' },
+        { name:'Product Release', icon:'bi-unlock' },
+        { name:'Labeling & Coding', icon:'bi-tag' },
+        { name:'Serialization', icon:'bi-upc' },
+        { name:'Palletization', icon:'bi-stack' },
+        { name:'Batch Traceability', icon:'bi-diagram-3' },
+        { name:'Finished Goods Transfer', icon:'bi-arrow-left-right' },
+        { name:'Hold / Release', icon:'bi-pause-circle' },
+        { name:'Finished Goods Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    salesdispatch: {
+      title: 'Sales & Dispatch', bg:'#D1FAE5', color:'#059669',
+      items: [
+        { name:'Sales Order', icon:'bi-cart-check' },
+        { name:'Delivery Order', icon:'bi-truck' },
+        { name:'Pick List', icon:'bi-list-task' },
+        { name:'Packing', icon:'bi-archive' },
+        { name:'Shipment', icon:'bi-send' },
+        { name:'Invoice', icon:'bi-receipt' },
+        { name:'Customer Returns', icon:'bi-arrow-return-left' },
+        { name:'Logistics Tracking', icon:'bi-geo-alt' },
+        { name:'Dispatch Register', icon:'bi-journal-text' },
+        { name:'Dispatch Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    reports: {
+      title: 'Reports & Analytics', bg:'#DBEAFE', color:'#2563EB',
+      items: [
+        { name:'Executive Dashboard', icon:'bi-bar-chart-line' },
+        { name:'Inventory Reports', icon:'bi-boxes' },
+        { name:'Procurement Reports', icon:'bi-file-bar-graph' },
+        { name:'Production Reports', icon:'bi-gear-wide-connected' },
+        { name:'Quality Reports', icon:'bi-patch-check' },
+        { name:'Warehouse Reports', icon:'bi-building' },
+        { name:'Dispatch Reports', icon:'bi-truck' },
+        { name:'Batch Traceability', icon:'bi-diagram-3' },
+        { name:'Expiry Reports', icon:'bi-calendar-x' },
+        { name:'Audit Reports', icon:'bi-shield-lock' },
+        { name:'User Activity', icon:'bi-person-lines-fill' },
+        { name:'Custom Reports', icon:'bi-file-earmark-bar-graph' }
+      ]
+    },
+    workflow: {
+      title: 'Workflow & Approvals', bg:'#EDE9FE', color:'#7C3AED',
+      items: [
+        { name:'Approval Inbox', icon:'bi-inbox' },
+        { name:'Pending Approvals', icon:'bi-hourglass-split' },
+        { name:'Workflow Designer', icon:'bi-diagram-2' },
+        { name:'Escalation Rules', icon:'bi-arrow-up-circle' },
+        { name:'Email Notifications', icon:'bi-envelope' },
+        { name:'Approval History', icon:'bi-clock-history' }
+      ]
+    },
+    compliance: {
+      title: 'Compliance', bg:'#FEE2E2', color:'#B91C1C',
+      items: [
+        { name:'Audit Trail', icon:'bi-clock-history' },
+        { name:'Electronic Signatures', icon:'bi-vector-pen' },
+        { name:'Document Management', icon:'bi-folder2-open' },
+        { name:'SOP Management', icon:'bi-file-earmark-text' },
+        { name:'Validation Documents', icon:'bi-file-earmark-check' },
+        { name:'Regulatory Compliance', icon:'bi-shield-check' },
+        { name:'Recall Management', icon:'bi-exclamation-octagon' },
+        { name:'Compliance Dashboard', icon:'bi-speedometer2' }
+      ]
+    },
+    admin: {
+      title: 'Administration', bg:'#FFEDD5', color:'#F59E0B',
+      items: [
+        { name:'User Management', icon:'bi-people' },
+        { name:'Roles & Permissions', icon:'bi-person-badge' },
+        { name:'Menu Access', icon:'bi-list-ul' },
+        { name:'Approval Matrix', icon:'bi-diagram-2' },
+        { name:'Organization Settings', icon:'bi-building' },
+        { name:'Fiscal Year', icon:'bi-calendar-range' },
+        { name:'Number Series', icon:'bi-hash' },
+        { name:'Email Templates', icon:'bi-envelope-paper' },
+        { name:'Notification Settings', icon:'bi-bell' },
+        { name:'Backup & Restore', icon:'bi-cloud-arrow-down' },
+        { name:'Audit Logs', icon:'bi-journal-text' },
+        { name:'API Integration', icon:'bi-plug' },
+        { name:'Import / Export', icon:'bi-arrow-down-up' },
+        { name:'System Health', icon:'bi-heart-pulse' },
+        { name:'Application Settings', icon:'bi-gear' }
+      ]
+    }
+  };
+
+  const mastersPanel = document.getElementById('mastersPanel');
+  const mainContent = document.getElementById('mainContent');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelList = document.getElementById('panelList');
+  const sbItems = document.querySelectorAll('.sb-item[data-menu]');
+  const greetTitle = document.querySelector('.greet-title');
+  let currentMenu = 'dashboard';
+
+  function renderPanel(key){
+    const data = menuData[key];
+    if(!data) return;
+    panelTitle.textContent = data.title;
+    panelList.innerHTML = data.items.map(it =>
+      `<div class="masters-item"><div class="masters-icon" style="background:${data.bg};color:${data.color};"><i class="bi ${it.icon}"></i></div><span class="label">${it.name}</span><i class="bi bi-chevron-right chev"></i></div>`
+    ).join('');
+  }
+
+  function setMenu(key){
+    document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+    const target = document.querySelector(`.sb-item[data-menu="${key}"]`);
+    if (target) target.classList.add('active');
+    renderPanel(key);
+    if (greetTitle) greetTitle.textContent = menuData[key] ? menuData[key].title : 'Dashboard';
+    currentMenu = key;
+    // Keep panel always Constructor fixed permanently
+    mastersPanel.classList.add('open');
+    mainContent.classList.add('panel-open');
+  }
+
+  // Initial render — show Dashboard submenu by default
+  setMenu('dashboard');
+
+  sbItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = item.getAttribute('data-menu');
+      setMenu(key);
+    });
+  });
+
+  // Prevent panel from being closed by outside clicks / hamburger / collapse row
+  mastersPanel.addEventListener('click', (e) => e.stopPropagation());
+
+  // Toggle profile dropdown (My Account / Settings / Logout)
+  const profileBlock = document.getElementById('profileBlock');
+  const profileDropdown = document.getElementById('profileDropdown');
+  profileBlock.addEventListener('click', (e) => {
+    e.stopPropagation();
+    profileDropdown.classList.toggle('open');
+  });
+  document.addEventListener('click', () => {
+    profileDropdown.classList.remove('open');
+  });
+  profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+  // Production vs Target Bar Chart
+  const ctx1 = document.getElementById('prodTargetChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['Week 1','Week 2','Week 3','Week 4','Week 5'],
+      datasets: [
+        {
+          label: 'Target',
+          data: [800, 1050, 900, 1150, 750],
+          backgroundColor: '#93C5FD',
+          borderRadius: 3,
+          barPercentage: 0.45,
+          categoryPercentage: 0.55
+        },
+        {
+          label: 'Achieved',
+          data: [650, 580, 640, 950, 800],
+          backgroundColor: '#2563EB',
+          borderRadius: 3,
+          barPercentage: 0.45,
+          categoryPercentage: 0.55
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'start',
+          labels: { usePointStyle: true, boxWidth: 7, boxHeight: 7, color:'#6B7280', font:{size:10.5} }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 1250,
+          ticks: { stepSize: 250, color:'#9CA3AF', font:{size:9.5} },
+          grid: { color:'#F1F5F9' }
+        },
+        x: {
+          ticks: { color:'#6B7280', font:{size:9.5} },
+          grid: { display:false }
+        }
+      }
+    }
+  });
+
+  // Inventory Donut Chart
+  const ctx2 = document.getElementById('inventoryDonut').getContext('2d');
+  new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: ['Raw Materials','Packaging Materials','Finished Goods','Semi Finished','Others'],
+      datasets: [{
+        data: [858, 490, 613, 245, 244],
+        backgroundColor: ['#2563EB','#16A34A','#7C3AED','#F59E0B','#0D9488'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '72%',
+      plugins: { legend: { display:false }, tooltip: { enabled:true } }
+    }
+  });
+</script>
+
+</body>
+</html>
