@@ -54,6 +54,12 @@
     background:none;border:none;color:var(--text-dark);font-size:1.15rem;cursor:pointer;
     padding:5px;display:none;
   }
+  .hamburger-toggle{
+    cursor:pointer;
+    transition:background-color 140ms ease;
+  }
+  .hamburger-toggle:hover{background:#1B2A55;}
+  .hamburger-toggle:active{background:#243166;}
   .side-icon-wrap{
     width:88px;height:64px;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
@@ -469,6 +475,15 @@
     pointer-events:auto;
   }
 
+  /* Collapsed — hamburger flipped to chevron, panel slid out */
+  .masters-panel.collapsed{
+    transform:translateX(-100%);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .main-content.panel-collapsed{margin-left:88px;}
+
   /* Header — understated eyebrow style */
   .masters-header{
     display:flex;align-items:center;justify-content:space-between;
@@ -550,15 +565,6 @@
   .masters-item.is-selected:hover{
     background-color:var(--blue-dark);
     color:#fff;
-  }
-
-  /* JS-applied "pressed/clicked" state — survives the brief delay before navigation */
-  .masters-item.is-pressed{
-    background-color:var(--blue-dark);
-    color:#fff;
-    font-weight:700;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18), 0 1px 3px rgba(37,99,235,0.35);
-    transform:translateX(1px);
   }
 
   /* ============ MAIN CONTENT ============ */
@@ -670,6 +676,7 @@
     .masters-panel.open{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto;}
     .main-content{margin-left:88px;}
     .main-content.panel-open{margin-left:318px;}
+    .main-content.panel-collapsed{margin-left:88px;}
   }
   @media (max-width: 767px){
     .icon-sidebar{display:none;}
@@ -682,8 +689,8 @@
 
 <!-- TOP NAVBAR -->
 <div class="topnav">
-  <div class="side-icon-wrap">
-    <svg class="hamburger-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
+  <div class="side-icon-wrap hamburger-toggle" id="hamburgerToggle" role="button" tabindex="0" aria-label="Toggle submenu" title="Toggle submenu">
+    <svg class="hamburger-svg" id="hamburgerIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
       <line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
@@ -1276,36 +1283,16 @@
     const data = menuData[key];
     if(!data) return;
     panelTitle.textContent = data.title;
-    // Determine current submenu item based on the page URL
-    const currentPage = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
-    const currentPageMap = {
-      'overview.html': 'overview',
-      'kpi-dashboard.html': 'kpi-dashboard',
-      'notifications.html': 'notifications',
-      'calendar.html': 'calendar'
-    };
-    const currentSubmenu = currentPageMap[currentPage];
-
     panelList.innerHTML = data.items.map(it => {
       const target = it.target || '#';
-      // Mark is-selected on initial render if the URL matches
-      const isSel = currentSubmenu && target.endsWith(currentSubmenu);
-      return `<div class="masters-item${isSel ? ' is-selected' : ''}" data-target="${target}"><span class="bullet" aria-hidden="true"></span><span class="label">${it.name}</span></div>`;
+      return `<div class="masters-item" data-target="${target}"><span class="bullet" aria-hidden="true"></span><span class="label">${it.name}</span></div>`;
     }).join('');
-    // Wire submenu clicks to navigate with active-state feedback
+    // Wire submenu clicks to navigate
     panelList.querySelectorAll('.masters-item[data-target]').forEach(el => {
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Apply on-press active feedback
-        el.classList.add('is-pressed');
-        // Mark this item as selected within the current panel
-        panelList.querySelectorAll('.masters-item').forEach(i => i.classList.remove('is-selected'));
-        el.classList.add('is-selected');
         const t = el.getAttribute('data-target');
-        if (t && t !== '#') {
-          // Brief delay so the click/active state is visible before navigation
-          setTimeout(() => { window.location.href = t; }, 140);
-        }
+        if (t && t !== '#') window.location.href = t;
       });
     });
   }
@@ -1335,6 +1322,53 @@
 
   // Prevent panel from being closed by outside clicks / hamburger / collapse row
   mastersPanel.addEventListener('click', (e) => e.stopPropagation());
+
+  // ============ HAMBURGER ↔ CHEVRON TOGGLE ============
+  const hamburgerToggle = document.getElementById('hamburgerToggle');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+
+  // Two SVG fragments — animated by replacing inner markup on toggle
+  const ICON_HAMBURGER =
+    '<line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>';
+  const ICON_CHEVRON =
+    '<polyline points="9,5 16,12 9,19" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+
+  function setPanelCollapsed(collapsed){
+    if (collapsed){
+      // Panel collapses; main content expands to fill freed space
+      mastersPanel.classList.remove('open');
+      mastersPanel.classList.add('collapsed');
+      mainContent.classList.remove('panel-open');
+      mainContent.classList.add('panel-collapsed');
+      hamburgerIcon.innerHTML = ICON_CHEVRON;
+      hamburgerIcon.setAttribute('aria-label', 'Open submenu');
+      hamburgerToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      mastersPanel.classList.remove('collapsed');
+      mastersPanel.classList.add('open');
+      mainContent.classList.remove('panel-collapsed');
+      mainContent.classList.add('panel-open');
+      hamburgerIcon.innerHTML = ICON_HAMBURGER;
+      hamburgerIcon.setAttribute('aria-label', 'Collapse submenu');
+      hamburgerToggle.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  hamburgerToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isCollapsed = mastersPanel.classList.contains('collapsed');
+    setPanelCollapsed(!isCollapsed);
+  });
+  // Keyboard accessibility — Enter / Space toggle the same way
+  hamburgerToggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      const isCollapsed = mastersPanel.classList.contains('collapsed');
+      setPanelCollapsed(!isCollapsed);
+    }
+  });
 
   // Toggle profile dropdown (My Account / Settings / Logout)
   const profileBlock = document.getElementById('profileBlock');

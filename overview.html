@@ -208,7 +208,17 @@
     border-right:1px solid #E5E9F0;
     box-shadow:1px 0 0 rgba(255,255,255,1) inset,2px 0 18px rgba(15,23,42,0.04),8px 0 28px rgba(15,23,42,0.03);
     z-index:850;display:flex;flex-direction:column;
+    transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto;
+    transition:transform 220ms ease, opacity 220ms ease;
   }
+  /* Collapsed — hamburger flipped to chevron, panel slid out */
+  .masters-panel.collapsed{
+    transform:translateX(-100%);opacity:0;visibility:hidden;pointer-events:none;
+  }
+  .hamburger-toggle{cursor:pointer;transition:background-color 140ms ease;}
+  .hamburger-toggle:hover{background:#1B2A55;}
+  .hamburger-toggle:active{background:#243166;}
+  .main-content.panel-collapsed{margin-left:88px;}
   .masters-header{
     display:flex;align-items:center;justify-content:space-between;
     padding:14px 14px 10px;border-bottom:1px solid #ECEEF3;
@@ -244,6 +254,19 @@
     background-color:var(--blue-dark);color:#fff;font-weight:700;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18), 0 1px 3px rgba(37,99,235,0.35);
     transform:translateX(1px);
+  }
+  /* Disabled — previously-active submenu should fade and lose click affordance */
+  .masters-item.is-disabled{
+    background-color:#F1F5F9;color:#94A3B8;font-weight:500;
+    cursor:not-allowed;opacity:0.7;
+  }
+  .masters-item.is-disabled:hover{
+    background-color:#F1F5F9;color:#94A3B8;font-weight:500;
+    box-shadow:none;padding-left:12px;
+  }
+  .masters-item.is-disabled::after{
+    content:"";display:inline-block;width:14px;height:1px;
+    background:#94A3B8;margin-left:auto;flex-shrink:0;
   }
 
   /* ============ MAIN CONTENT ============ */
@@ -555,8 +578,8 @@
 
 <!-- TOP NAVBAR -->
 <div class="topnav">
-  <div class="side-icon-wrap">
-    <svg class="hamburger-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
+  <div class="side-icon-wrap hamburger-toggle" id="hamburgerToggle" role="button" tabindex="0" aria-label="Toggle submenu" title="Toggle submenu">
+    <svg class="hamburger-svg" id="hamburgerIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
       <line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
@@ -1187,9 +1210,16 @@
         e.stopPropagation();
         // On-press visual feedback
         el.classList.add('is-pressed');
-        // Mark this item as selected within the current panel
-        panelList.querySelectorAll('.masters-item').forEach(i => i.classList.remove('is-selected'));
-        el.classList.add('is-selected');
+        // Mark this item as selected, mark all siblings as disabled
+        panelList.querySelectorAll('.masters-item').forEach(i => {
+          if (i === el){
+            i.classList.add('is-selected');
+            i.classList.remove('is-disabled');
+          } else {
+            i.classList.remove('is-selected');
+            i.classList.add('is-disabled');
+          }
+        });
         const t = el.getAttribute('data-target');
         if (t && t !== '#') {
           // Brief delay so the click/active state is visible before navigation
@@ -1216,6 +1246,51 @@
 
   // Initial render
   renderPanel('dashboard');
+
+  // ============ HAMBURGER ↔ CHEVRON TOGGLE ============
+  const hamburgerToggle = document.getElementById('hamburgerToggle');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+  const mainContentOv = document.getElementById('mainContent');
+
+  const ICON_HAMBURGER_OV =
+    '<line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>';
+  const ICON_CHEVRON_OV =
+    '<polyline points="9,5 16,12 9,19" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+
+  function setPanelCollapsedOv(collapsed){
+    if (collapsed){
+      mastersPanel.classList.remove('open');
+      mastersPanel.classList.add('collapsed');
+      mainContentOv.classList.remove('panel-open');
+      mainContentOv.classList.add('panel-collapsed');
+      hamburgerIcon.innerHTML = ICON_CHEVRON_OV;
+      hamburgerIcon.setAttribute('aria-label', 'Open submenu');
+      hamburgerToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      mastersPanel.classList.remove('collapsed');
+      mastersPanel.classList.add('open');
+      mainContentOv.classList.remove('panel-collapsed');
+      mainContentOv.classList.add('panel-open');
+      hamburgerIcon.innerHTML = ICON_HAMBURGER_OV;
+      hamburgerIcon.setAttribute('aria-label', 'Collapse submenu');
+      hamburgerToggle.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  hamburgerToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isCollapsed = mastersPanel.classList.contains('collapsed');
+    setPanelCollapsedOv(!isCollapsed);
+  });
+  hamburgerToggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      const isCollapsed = mastersPanel.classList.contains('collapsed');
+      setPanelCollapsedOv(!isCollapsed);
+    }
+  });
 
   // ============ PROFILE DROPDOWN ============
   const profileBlock = document.getElementById('profileBlock');
