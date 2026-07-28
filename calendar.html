@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHARMA ERP - Calendar</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1B3D;
+    --blue:#2563EB;
+    --blue-dark:#1E4FD6;
+    --page-bg:#F5F7FA;
+    --text-dark:#1F2937;
+    --text-gray:#6B7280;
+    --text-gray-light:#9CA3AF;
+    --border:#EEF1F5;
+    --green:#16A34A;
+    --red:#DC2626;
+    --purple:#7C3AED;
+    --orange:#F59E0B;
+    --teal:#0D9488;
+    --shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:var(--page-bg);color:var(--text-dark);margin:0;overflow-x:hidden;}
+  a{text-decoration:none;}
+
+  /* TOP NAVBAR */
+  .topnav{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0;position:fixed;top:0;left:0;right:0;z-index:1000;gap:14px;}
+  .side-icon-wrap{width:88px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:8px;}
+  .side-icon-wrap svg{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block;}
+  .hamburger-svg{width:26px !important;height:26px !important;max-width:26px !important;max-height:26px !important;}
+  .brand-logo{width:80px;height:80px;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:0;margin-top:-8px;margin-bottom:-8px;}
+  .brand-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+  .nav-spacer{flex:1;padding-right:18px;}
+  .nav-icon-item{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer;color:var(--text-dark);min-width:44px;}
+  .nav-icon-item.no-cursor{cursor:pointer;}
+  .nav-icon-item i{font-size:0.98rem;color:#4B5563;}
+  .nav-icon-item > span{font-size:0.58rem;color:var(--text-gray);font-weight:500;}
+  .nav-badge{position:absolute;top:-4px;right:6px;background:var(--red);color:#fff !important;font-size:0.68rem;font-weight:700;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;}
+  .notif-dropdown{position:absolute;top:calc(100% + 12px);right:0;width:340px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:1100;display:none;flex-direction:column;overflow:hidden;}
+  .notif-dropdown.open{display:flex;}
+  .notif-dropdown::before{content:"";position:absolute;top:-7px;right:18px;width:12px;height:12px;background:#fff;border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg);}
+  .notif-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:#F8FAFC;}
+  .notif-header-title{font-size:0.82rem;font-weight:700;color:var(--text-dark);display:flex;align-items:center;gap:6px;}
+  .notif-header-title .count-badge{background:var(--red);color:#fff;font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:10px;line-height:1.3;}
+  .notif-mark-all{font-size:0.68rem;color:var(--blue);font-weight:600;cursor:pointer;}
+  .notif-list{max-height:360px;overflow-y:auto;}
+  .notif-item{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color 140ms ease;position:relative;}
+  .notif-item:hover{background:#F8FAFC;}
+  .notif-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;color:#fff;flex-shrink:0;}
+  .notif-icon-red{background:#DC2626;}
+  .notif-icon-orange{background:#F59E0B;}
+  .notif-icon-blue{background:#2563EB;}
+  .notif-body{flex:1;min-width:0;}
+  .notif-title{font-size:0.76rem;font-weight:700;color:var(--text-dark);line-height:1.3;margin-bottom:2px;}
+  .notif-desc{font-size:0.7rem;color:var(--text-gray);line-height:1.35;}
+  .notif-time{font-size:0.62rem;color:var(--text-gray-light);margin-top:3px;display:block;}
+  .notif-unread-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);position:absolute;top:14px;right:14px;flex-shrink:0;}
+  .notif-footer{padding:9px 14px;text-align:center;border-top:1px solid var(--border);background:#F8FAFC;}
+  .notif-footer a{font-size:0.72rem;font-weight:600;color:var(--blue);}
+
+  .profile-block{display:flex;align-items:center;gap:8px;cursor:pointer;padding-left:12px;border-left:1px solid var(--border);margin-left:4px;position:relative;}
+  .profile-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;overflow:hidden;}
+  .profile-avatar svg{width:100%;height:100%;display:block;}
+  .profile-info{display:flex;flex-direction:column;gap:3px;line-height:1.15;}
+  .profile-name{font-size:0.76rem;font-weight:700;color:var(--text-dark);line-height:1.15;margin:0;}
+  .profile-role{font-size:0.62rem;color:var(--text-gray);line-height:1.15;margin:0;}
+  .profile-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:190px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);padding:6px;display:none;flex-direction:column;z-index:1100;}
+  .profile-dropdown.open{display:flex;}
+  .profile-dd-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;font-size:0.78rem;font-weight:500;color:var(--text-dark);}
+  .profile-dd-item i{font-size:0.9rem;color:var(--text-gray);width:16px;}
+  .profile-dd-item:hover{background:var(--page-bg);}
+  .profile-dd-divider{height:1px;background:var(--border);margin:5px 2px;}
+  .profile-dd-danger{color:var(--red);}
+  .profile-dd-danger i{color:var(--red);}
+
+  /* ICON SIDEBAR */
+  .icon-sidebar{position:fixed;top:0;bottom:0;left:0;width:88px;background:var(--navy);display:flex;flex-direction:column;align-items:stretch;padding-top:68px;z-index:905;overflow:hidden;}
+  .sb-item{flex:0 0 auto;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 4px;color:#AEB8D6;cursor:pointer;text-align:center;position:relative;}
+  .sb-item i{font-size:1.05rem;}
+  .sb-item span{font-size:0.6rem;font-weight:600;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;hyphens:auto;padding:0 2px;width:100%;}
+  .sb-item:hover{color:#fff;}
+  .sb-item.active{color:#fff;}
+  .sb-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--blue);border-radius:0 4px 4px 0;}
+  .sb-item.active .sb-icon-wrap{background:var(--blue);border-radius:8px;}
+  .sb-icon-wrap{width:30px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+
+  /* SUBMENU FLYOUT */
+  .masters-panel{position:fixed;top:64px;bottom:0;left:88px;width:230px;background:linear-gradient(180deg,#FBFCFE 0%,#F8FAFC 100%);border-right:1px solid #E5E9F0;box-shadow:1px 0 0 rgba(255,255,255,1) inset,2px 0 18px rgba(15,23,42,0.04),8px 0 28px rgba(15,23,42,0.03);z-index:850;display:flex;flex-direction:column;}
+  .masters-header{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;border-bottom:1px solid #ECEEF3;margin-bottom:6px;background:linear-gradient(180deg,rgba(255,255,255,0.6) 0%,rgba(255,255,255,0) 100%);}
+  .masters-header h6{margin:0;font-weight:800;font-size:0.78rem;color:#000;letter-spacing:0.3px;}
+  .masters-list{overflow:visible;padding:6px 6px 16px;flex:1 1 auto;}
+  .masters-item{position:relative;display:flex;align-items:center;gap:0;padding:9px 10px 9px 12px;margin:0;color:#0F172A;font-size:0.78rem;font-weight:500;line-height:1.35;cursor:pointer;overflow:hidden;border-radius:6px;border-bottom:none;background-color:transparent;transition:background-color 140ms ease,color 140ms ease,box-shadow 140ms ease,padding-left 140ms ease,font-weight 140ms ease;}
+  .masters-item span,.masters-item .label{white-space:normal;overflow:visible;text-overflow:clip;flex:1 1 auto;min-width:0;word-break:break-word;line-height:1.35;display:block;}
+  .masters-item:hover{background-color:var(--blue);color:#fff;font-weight:700;box-shadow:0 1px 2px rgba(37,99,235,0.18);padding-left:14px;}
+  .masters-item:active{background-color:var(--blue-dark);color:#fff;font-weight:700;}
+  .masters-item.is-selected{background-color:var(--blue);color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12);}
+  .masters-item.is-selected:hover{background-color:var(--blue-dark);color:#fff;}
+
+  /* MAIN CONTENT */
+  .main-content{margin-left:318px;margin-right:0;margin-top:64px;padding:14px 20px 16px;min-height:calc(100vh - 64px);}
+  .greet-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .greet-sub{font-size:0.76rem;color:var(--text-gray);margin-bottom:2px;}
+  .greet-title{font-size:1.3rem;font-weight:800;color:var(--text-dark);margin-bottom:2px;}
+  .greet-desc{font-size:0.76rem;color:var(--text-gray);}
+  .card-base{background:#fff;border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text-dark);font-weight:600;font-size:0.74rem;padding:6px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .btn-ghost:hover{background:var(--page-bg);border-color:#D1D5DB;}
+  .btn-primary{background:var(--blue);border:none;color:#fff;font-weight:600;font-size:0.74rem;padding:6px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+  .btn-primary:hover{background:var(--blue-dark);}
+
+  /* Toolbar */
+  .cal-toolbar{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:#fff;border:1px solid var(--border);border-radius:12px;
+    padding:10px 12px;margin-bottom:12px;
+  }
+  .cal-nav{display:inline-flex;align-items:center;gap:4px;}
+  .cal-nav button{
+    background:var(--page-bg);border:1px solid var(--border);color:var(--text-dark);
+    width:28px;height:28px;border-radius:7px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:0.78rem;
+  }
+  .cal-nav button:hover{background:#fff;border-color:#D1D5DB;}
+  .cal-month{font-size:0.86rem;font-weight:800;color:var(--text-dark);min-width:170px;text-align:center;}
+  .filter-tabs{display:inline-flex;background:var(--page-bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px;}
+  .filter-tab{font-size:0.7rem;font-weight:600;color:var(--text-gray);padding:5px 10px;border-radius:6px;cursor:pointer;border:none;background:transparent;}
+  .filter-tab.active{background:var(--blue);color:#fff;}
+  .toolbar-spacer{flex:1;}
+
+  /* Legend */
+  .legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:0.66rem;color:var(--text-gray);}
+  .legend-item{display:inline-flex;align-items:center;gap:5px;}
+  .legend-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* Layout split */
+  .cal-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;align-items:start;}
+
+  /* Month grid */
+  .cal-card{padding:12px 12px 10px;}
+  .cal-weekdays{
+    display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+    border-bottom:1px solid var(--border);
+    margin-bottom:6px;
+  }
+  .cal-weekday{
+    text-align:center;padding:6px 0;
+    font-size:0.66rem;font-weight:800;color:var(--text-gray);
+    text-transform:uppercase;letter-spacing:0.5px;
+  }
+  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+  .cal-cell{
+    background:#fff;border:1px solid var(--border);border-radius:8px;
+    min-height:82px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;
+    cursor:pointer;transition:background-color 140ms ease,border-color 140ms ease;
+  }
+  .cal-cell:hover{background:#F8FAFC;border-color:#DBE7FF;}
+  .cal-cell.other{background:#F8FAFC;color:var(--text-gray-light);}
+  .cal-cell.other .cal-num{color:var(--text-gray-light);}
+  .cal-cell.today{border-color:var(--blue);border-width:1.5px;background:#F0F5FF;}
+  .cal-cell.today .cal-num{
+    background:var(--blue);color:#fff;
+    width:20px;height:20px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cal-num{font-size:0.7rem;font-weight:800;color:var(--text-dark);line-height:1;}
+  .cal-events{display:flex;flex-direction:column;gap:2px;}
+  .cal-evt{
+    font-size:0.58rem;font-weight:600;
+    padding:1px 5px;border-radius:4px;
+    background:#F1F5F9;color:var(--text-dark);
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+    line-height:1.4;
+  }
+  .cal-evt.qc{background:#FEE2E2;color:#991B1B;}
+  .cal-evt.prod{background:#E0E7FF;color:#3730A3;}
+  .cal-evt.comp{background:#FEF3C7;color:#92400E;}
+  .cal-evt.disp{background:#DCFCE7;color:#15803D;}
+  .cal-evt.proc{background:#DBEAFE;color:#1D4ED8;}
+  .cal-evt.stab{background:#F5D0FE;color:#86198F;}
+  .cal-evt.more{background:transparent;color:var(--text-gray);font-weight:700;padding:0 5px;}
+
+  /* Agenda panel */
+  .agenda-card{padding:12px;}
+  .agenda-title{font-size:0.78rem;font-weight:800;color:var(--text-dark);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+  .agenda-title .count-pill{font-size:0.6rem;font-weight:700;background:#DBEAFE;color:#1D4ED8;padding:1px 7px;border-radius:10px;}
+  .agenda-day-label{
+    font-size:0.6rem;font-weight:800;color:var(--text-gray);
+    text-transform:uppercase;letter-spacing:0.5px;
+    padding:8px 0 4px;border-top:1px solid var(--border);
+    margin-top:6px;
+  }
+  .agenda-day-label:first-of-type{border-top:none;margin-top:0;padding-top:0;}
+  .agenda-item{
+    display:flex;gap:9px;align-items:flex-start;
+    padding:7px 0;border-bottom:1px dashed var(--border);
+    cursor:pointer;
+  }
+  .agenda-item:last-child{border-bottom:none;}
+  .agenda-item:hover .agenda-title-txt{color:var(--blue);}
+  .agenda-time{
+    width:46px;flex-shrink:0;
+    font-size:0.66rem;font-weight:700;color:var(--text-dark);text-align:center;
+    background:#F8FAFC;border:1px solid var(--border);border-radius:6px;
+    padding:4px 0;line-height:1.15;
+  }
+  .agenda-time .day{font-size:0.95rem;display:block;}
+  .agenda-time .mon{font-size:0.58rem;color:var(--text-gray);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;display:block;}
+  .agenda-body{flex:1;min-width:0;}
+  .agenda-title-txt{font-size:0.74rem;font-weight:700;color:var(--text-dark);line-height:1.25;margin-bottom:2px;}
+  .agenda-meta{font-size:0.62rem;color:var(--text-gray);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .tag-pill{
+    font-size:0.58rem;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
+    padding:1px 6px;border-radius:10px;
+  }
+  .tag-pill.qc{background:#FEE2E2;color:#991B1B;}
+  .tag-pill.prod{background:#E0E7FF;color:#3730A3;}
+  .tag-pill.comp{background:#FEF3C7;color:#92400E;}
+  .tag-pill.disp{background:#DCFCE7;color:#15803D;}
+  .tag-pill.proc{background:#DBEAFE;color:#1D4ED8;}
+  .tag-pill.stab{background:#F5D0FE;color:#86198F;}
+
+  @media (max-width:1199px){.cal-layout{grid-template-columns:1fr;}}
+  @media (max-width:991px){
+    .masters-panel{transform:translateX(-12px);opacity:0;visibility:hidden;pointer-events:none;}
+    .masters-panel.open{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto;}
+    .main-content{margin-left:88px;}
+    .main-content.panel-open{margin-left:318px;}
+  }
+  @media (max-width:767px){
+    .icon-sidebar{display:none;}
+    .side-icon-wrap{display:none;}
+    .main-content{margin-left:0;padding:14px;}
+    .cal-cell{min-height:60px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="topnav">
+  <div class="side-icon-wrap">
+    <svg class="hamburger-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
+      <line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="brand-logo">
+    <img src="assets/image (21).png" alt="Pharma ERP Logo">
+  </div>
+  <div class="nav-spacer"></div>
+
+  <div class="d-flex align-items-center gap-1">
+    <div class="nav-icon-item" id="notifBell">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+      <span class="nav-badge" id="notifBadge">3</span>
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <div class="notif-header-title">Notifications <span class="count-badge" id="notifCountBadge">3 New</span></div>
+          <div class="notif-mark-all" id="notifMarkAll">Mark all read</div>
+        </div>
+        <div class="notif-list" id="notifList">
+          <div class="notif-item" data-id="n1">
+            <div class="notif-icon notif-icon-red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">Batch B240601 - QC Test Failed</div>
+              <div class="notif-desc">Paracetamol 500mg batch has failed the assay test.</div>
+              <span class="notif-time">10 mins ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-item" data-id="n2">
+            <div class="notif-icon notif-icon-orange"><i class="bi bi-calendar-x-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">Near-Expiry Stock Alert</div>
+              <div class="notif-desc">42 batches of Amoxicillin 250mg will expire within 30 days.</div>
+              <span class="notif-time">1 hour ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-item" data-id="n3">
+            <div class="notif-icon notif-icon-blue"><i class="bi bi-cart-check-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">PO-2024-00125 - Pending Approval</div>
+              <div class="notif-desc">Purchase order from MedChem Laboratories (₹4,82,500) is awaiting your sign-off.</div>
+              <span class="notif-time">2 hours ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+        </div>
+        <div class="notif-footer"><a href="#">View All Notifications</a></div>
+      </div>
+    </div>
+    <div class="nav-icon-item no-cursor">
+      <i class="bi bi-question-circle"></i>
+      <span>Help</span>
+    </div>
+  </div>
+
+  <div class="profile-block" id="profileBlock">
+    <div class="profile-avatar" aria-label="Shailendra Singh">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="paBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#DBEAFE"/><stop offset="100%" stop-color="#93C5FD"/></linearGradient></defs>
+        <circle cx="16" cy="16" r="16" fill="url(#paBg)"/>
+        <circle cx="16" cy="12" r="5" fill="#1E40AF"/>
+        <path d="M5 28 C 5 22, 9.5 19, 16 19 C 22.5 19, 27 22, 27 28 L 27 32 L 5 32 Z" fill="#1E40AF"/>
+      </svg>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">Shailendra Singh</div>
+      <div class="profile-role">Chief Operating Officer</div>
+    </div>
+    <i class="bi bi-chevron-down" style="font-size:0.7rem;color:var(--text-gray);"></i>
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="#" class="profile-dd-item"><i class="bi bi-person-circle"></i> My Account</a>
+      <div class="profile-dd-divider"></div>
+      <a href="#" class="profile-dd-item profile-dd-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- LEFT ICON SIDEBAR -->
+<div class="icon-sidebar" id="iconSidebar">
+  <div class="sb-item active" data-menu="dashboard"><div class="sb-icon-wrap"><i class="bi bi-house-door-fill"></i></div><span>Dashboard</span></div>
+  <div class="sb-item" data-menu="masterdata"><div class="sb-icon-wrap"><i class="bi bi-diagram-3"></i></div><span>Masters</span></div>
+  <div class="sb-item" data-menu="purchasing"><div class="sb-icon-wrap"><i class="bi bi-cart3"></i></div><span>Procurement</span></div>
+  <div class="sb-item" data-menu="goodsreceipt"><div class="sb-icon-wrap"><i class="bi bi-box-arrow-in-down"></i></div><span>Goods Receipt</span></div>
+  <div class="sb-item" data-menu="qualitymgmt"><div class="sb-icon-wrap"><i class="bi bi-patch-check"></i></div><span>Quality Control</span></div>
+  <div class="sb-item" data-menu="production"><div class="sb-icon-wrap"><i class="bi bi-gear-wide-connected"></i></div><span>Production</span></div>
+  <div class="sb-item" data-menu="warehouse"><div class="sb-icon-wrap"><i class="bi bi-building"></i></div><span>Warehouse</span></div>
+  <div class="sb-item" data-menu="finishedgoods"><div class="sb-icon-wrap"><i class="bi bi-box-seam"></i></div><span>Finished Goods</span></div>
+  <div class="sb-item" data-menu="salesdispatch"><div class="sb-icon-wrap"><i class="bi bi-truck"></i></div><span>Sales &amp; Dispatch</span></div>
+  <div class="sb-item" data-menu="reports"><div class="sb-icon-wrap"><i class="bi bi-bar-chart-line"></i></div><span>Reports</span></div>
+  <div class="sb-item" data-menu="compliance"><div class="sb-icon-wrap"><i class="bi bi-shield-check"></i></div><span>Compliance</span></div>
+  <div class="sb-item" data-menu="admin"><div class="sb-icon-wrap"><i class="bi bi-person-gear"></i></div><span>Administration</span></div>
+</div>
+
+<!-- SUBMENU FLYOUT -->
+<div class="masters-panel open" id="mastersPanel">
+  <div class="masters-header"><h6 id="panelTitle">Dashboard</h6></div>
+  <div class="masters-list" id="panelList"></div>
+</div>
+
+<!-- MAIN CONTENT — CALENDAR -->
+<div class="main-content panel-open" id="mainContent">
+
+  <div class="greet-row">
+    <div>
+      <div class="greet-sub">Welcome back, Shailendra Singh</div>
+      <div class="greet-title">Calendar</div>
+      <div class="greet-desc">Scheduled production runs, stability pull-points, compliance reviews &amp; key approval deadlines.</div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button class="btn-ghost"><i class="bi bi-funnel"></i> Filter</button>
+      <button class="btn-primary"><i class="bi bi-plus-lg"></i> New Event</button>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="cal-toolbar">
+    <div class="cal-nav">
+      <button title="Previous month" id="prevMonth"><i class="bi bi-chevron-left"></i></button>
+      <button title="Today" id="todayBtn"><i class="bi bi-dot"></i></button>
+      <button title="Next month" id="nextMonth"><i class="bi bi-chevron-right"></i></button>
+    </div>
+    <div class="cal-month" id="calMonth">July 2026</div>
+
+    <div class="filter-tabs" id="viewTabs">
+      <button class="filter-tab active" data-view="month">Month</button>
+      <button class="filter-tab" data-view="week">Week</button>
+      <button class="filter-tab" data-view="agenda">Agenda</button>
+    </div>
+
+    <div class="toolbar-spacer"></div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>QC</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#7C3AED;"></span>Production</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#F59E0B;"></span>Compliance</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span>Dispatch</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2563EB;"></span>Procurement</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#D946EF;"></span>Stability</span>
+    </div>
+  </div>
+
+  <!-- Layout: Calendar + Agenda -->
+  <div class="cal-layout">
+
+    <!-- MONTH GRID -->
+    <div class="card-base cal-card">
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Sun</div>
+        <div class="cal-weekday">Mon</div>
+        <div class="cal-weekday">Tue</div>
+        <div class="cal-weekday">Wed</div>
+        <div class="cal-weekday">Thu</div>
+        <div class="cal-weekday">Fri</div>
+        <div class="cal-weekday">Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+
+    <!-- AGENDA -->
+    <div class="card-base agenda-card">
+      <div class="agenda-title">
+        <span>Upcoming Agenda</span>
+        <span class="count-pill">8 events</span>
+      </div>
+
+      <div class="agenda-day-label">Today · 28 Jul</div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">28</span><span class="mon">Tue</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">PO Approval — MedChem Laboratories</div>
+          <div class="agenda-meta"><span class="tag-pill proc">Procurement</span><span>Awaiting COO sign-off</span></div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">28</span><span class="mon">Tue</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">Batch Release Queue review</div>
+          <div class="agenda-meta"><span class="tag-pill qc">QC</span><span>3 batches pending</span></div>
+        </div>
+      </div>
+
+      <div class="agenda-day-label">Wed · 29 Jul</div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">29</span><span class="mon">Wed</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">Production Schedule publish</div>
+          <div class="agenda-meta"><span class="tag-pill prod">Production</span><span>Week 31 · 18 orders</span></div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">29</span><span class="mon">Wed</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">MRP Run — Auto-generated</div>
+          <div class="agenda-meta"><span class="tag-pill proc">Procurement</span><span>Weekly cycle</span></div>
+        </div>
+      </div>
+
+      <div class="agenda-day-label">Thu · 30 Jul</div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">30</span><span class="mon">Thu</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">Stability Pull — 6M (Paracetamol)</div>
+          <div class="agenda-meta"><span class="tag-pill stab">Stability</span><span>Batch B240118</span></div>
+        </div>
+      </div>
+
+      <div class="agenda-day-label">Fri · 31 Jul</div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">31</span><span class="mon">Fri</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">Monthly KPI Submission</div>
+          <div class="agenda-meta"><span class="tag-pill comp">Compliance</span><span>Deadline: EOD</span></div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">31</span><span class="mon">Fri</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">Dispatch Cutoff — Export orders</div>
+          <div class="agenda-meta"><span class="tag-pill disp">Dispatch</span><span>SEZ shipments</span></div>
+        </div>
+      </div>
+
+      <div class="agenda-day-label">Mon · 03 Aug</div>
+      <div class="agenda-item">
+        <div class="agenda-time"><span class="day">03</span><span class="mon">Mon</span></div>
+        <div class="agenda-body">
+          <div class="agenda-title-txt">SOP Review — Cleaning Validation</div>
+          <div class="agenda-meta"><span class="tag-pill comp">Compliance</span><span>Quarterly cycle</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============ MENU DATA (Dashboard submenu only) ============
+  const menuData = {
+    dashboard: {
+      title:'Dashboard',
+      items:[
+        { name:'Overview', icon:'bi-speedometer2', target:'overview.html' },
+        { name:'KPI Dashboard', icon:'bi-bar-chart-line', target:'kpi-dashboard.html' },
+        { name:'Notifications', icon:'bi-bell', target:'notifications.html' },
+        { name:'Calendar', icon:'bi-calendar3', target:'calendar.html' }
+      ]
+    }
+  };
+
+  const mastersPanel = document.getElementById('mastersPanel');
+  const mainContent = document.getElementById('mainContent');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelList = document.getElementById('panelList');
+  const sbItems = document.querySelectorAll('.sb-item[data-menu]');
+
+  // Determine which submenu item is the current page
+  const currentPage = (window.location.pathname.split('/').pop() || 'calendar.html').toLowerCase();
+  const currentPageMap = {
+    'overview.html': 'overview',
+    'kpi-dashboard.html': 'kpi-dashboard',
+    'notifications.html': 'notifications',
+    'calendar.html': 'calendar',
+    'index.html': 'recent-activities'
+  };
+  const currentSubmenu = currentPageMap[currentPage] || 'calendar';
+
+  function renderPanel(key){
+    const data = menuData[key];
+    if(!data) return;
+    panelTitle.textContent = data.title;
+    panelList.innerHTML = data.items.map(it => {
+      const target = it.target || '#';
+      return `<div class="masters-item" data-target="${target}"><span class="label">${it.name}</span></div>`;
+    }).join('');
+    // Mark the current page as selected
+    const selected = panelList.querySelector(`[data-target$="${currentSubmenu}"]`);
+    if (selected) selected.classList.add('is-selected');
+    // Wire submenu clicks to navigate
+    panelList.querySelectorAll('.masters-item[data-target]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const t = el.getAttribute('data-target');
+        if (t && t !== '#') window.location.href = t;
+      });
+    });
+  }
+
+  sbItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      const key = item.getAttribute('data-menu');
+      if (key !== 'dashboard') { window.location.href = 'index.html#' + key; return; }
+      renderPanel(key);
+    });
+  });
+
+  renderPanel('dashboard');
+
+  // PROFILE
+  const profileBlock = document.getElementById('profileBlock');
+  const profileDropdown = document.getElementById('profileDropdown');
+  profileBlock.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('open'); });
+  document.addEventListener('click', () => profileDropdown.classList.remove('open'));
+  profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+  // NOTIF BELL
+  const notifBell = document.getElementById('notifBell');
+  const notifDropdown = document.getElementById('notifDropdown');
+  const notifItems = document.querySelectorAll('.notif-item');
+  const notifBadge = document.getElementById('notifBadge');
+  const notifCountBadge = document.getElementById('notifCountBadge');
+  const notifMarkAll = document.getElementById('notifMarkAll');
+  notifBell.addEventListener('click', (e) => { e.stopPropagation(); notifDropdown.classList.toggle('open'); profileDropdown.classList.remove('open'); });
+  notifDropdown.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => notifDropdown.classList.remove('open'));
+  notifItems.forEach(item => item.addEventListener('click', () => {
+    const dot = item.querySelector('.notif-unread-dot'); if (dot) dot.remove(); updateUnreadCount();
+  }));
+  notifMarkAll.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifItems.forEach(item => { const dot = item.querySelector('.notif-unread-dot'); if (dot) dot.remove(); });
+    updateUnreadCount();
+  });
+  function updateUnreadCount(){
+    const remaining = document.querySelectorAll('.notif-item .notif-unread-dot').length;
+    if (remaining <= 0){ notifBadge.style.display='none'; notifCountBadge.textContent='0 New'; notifCountBadge.style.background='#94A3B8'; }
+    else { notifBadge.style.display='flex'; notifBadge.textContent=remaining; notifCountBadge.textContent=remaining+' New'; notifCountBadge.style.background=''; }
+  }
+
+  // VIEW TABS (UI state stub)
+  document.querySelectorAll('#viewTabs .filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#viewTabs .filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // ============ CALENDAR GENERATION ============
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const EVENTS = {
+    // July 2026 — keyed by ISO date
+    '2026-07-01': [{c:'proc',t:'MRP Run'},{c:'comp',t:'Audit review'}],
+    '2026-07-02': [{c:'qc',t:'Batch release'}],
+    '2026-07-03': [{c:'disp',t:'Dispatch cutoff'}],
+    '2026-07-04': [],
+    '2026-07-05': [],
+    '2026-07-06': [{c:'prod',t:'PO-156 start'}],
+    '2026-07-07': [{c:'stab',t:'3M pull'}],
+    '2026-07-08': [{c:'qc',t:'OOS review'}],
+    '2026-07-09': [{c:'proc',t:'PO approval'}],
+    '2026-07-10': [{c:'disp',t:'Export cutoff'}],
+    '2026-07-11': [],
+    '2026-07-12': [],
+    '2026-07-13': [{c:'prod',t:'Line clearance'}],
+    '2026-07-14': [{c:'stab',t:'6M pull'},{c:'comp',t:'CAPA review'}],
+    '2026-07-15': [{c:'qc',t:'Final QC'}],
+    '2026-07-16': [{c:'proc',t:'RFQ cycle'}],
+    '2026-07-17': [{c:'disp',t:'Shipment'}],
+    '2026-07-18': [],
+    '2026-07-19': [],
+    '2026-07-20': [{c:'prod',t:'PO-157 start'},{c:'qc',t:'Stability'}],
+    '2026-07-21': [{c:'comp',t:'SOP review'}],
+    '2026-07-22': [{c:'stab',t:'1M pull'}],
+    '2026-07-23': [{c:'proc',t:'PO-00125'}],
+    '2026-07-24': [{c:'qc',t:'Batch closure'},{c:'disp',t:'Dispatch'}],
+    '2026-07-25': [],
+    '2026-07-26': [],
+    '2026-07-27': [{c:'comp',t:'CAPA overdue'},{c:'stab',t:'9M pull'}],
+    '2026-07-28': [{c:'proc',t:'PO approval'},{c:'qc',t:'Release queue'},{c:'comp',t:'Recall mgmt'}],
+    '2026-07-29': [{c:'prod',t:'Schedule pub'},{c:'proc',t:'MRP Run'}],
+    '2026-07-30': [{c:'stab',t:'6M pull'}],
+    '2026-07-31': [{c:'comp',t:'KPI submit'},{c:'disp',t:'Dispatch cutoff'}],
+    '2026-08-01': [],
+    '2026-08-02': [],
+    '2026-08-03': [{c:'comp',t:'SOP review'},{c:'stab',t:'12M pull'}],
+    '2026-08-04': [{c:'qc',t:'Batch release'}],
+    '2026-08-05': [{c:'prod',t:'PO-158 start'}],
+    '2026-08-06': [],
+    '2026-08-07': [{c:'proc',t:'PO approval'}],
+    '2026-08-08': [],
+    '2026-08-09': [],
+    '2026-08-10': [{c:'stab',t:'6M pull'},{c:'comp',t:'Audit close'}],
+    '2026-08-11': [{c:'disp',t:'Dispatch'}],
+    '2026-08-12': [{c:'qc',t:'Final QC'}],
+  };
+
+  const today = new Date(2026, 6, 28); // July 28, 2026 (today per system context)
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth();
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function isoKey(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; }
+
+  function renderCalendar(){
+    document.getElementById('calMonth').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const startDow = firstDay.getDay(); // 0=Sun
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const prevDays = new Date(viewYear, viewMonth, 0).getDate();
+
+    const cells = [];
+    // Previous month overflow
+    for (let i = startDow - 1; i >= 0; i--){
+      const d = prevDays - i;
+      cells.push({ y: viewMonth === 0 ? viewYear - 1 : viewYear, m: (viewMonth + 11) % 12, d, other:true });
+    }
+    // Current month
+    for (let d = 1; d <= daysInMonth; d++){
+      cells.push({ y: viewYear, m: viewMonth, d, other:false });
+    }
+    // Next month overflow to fill 6 rows = 42 cells
+    let nextD = 1;
+    while (cells.length < 42){
+      cells.push({ y: viewMonth === 11 ? viewYear + 1 : viewYear, m: (viewMonth + 1) % 12, d: nextD, other:true });
+      nextD++;
+    }
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = cells.map(c => {
+      const key = isoKey(c.y, c.m, c.d);
+      const evs = EVENTS[key] || [];
+      const isToday = (c.d === today.getDate() && c.m === today.getMonth() && c.y === today.getFullYear() && !c.other);
+      const visible = evs.slice(0,2);
+      const overflow = evs.length > 2 ? evs.length - 2 : 0;
+      return `
+        <div class="cal-cell ${c.other ? 'other':''} ${isToday ? 'today':''}" data-key="${key}">
+          <div class="cal-num">${c.d}</div>
+          <div class="cal-events">
+            ${visible.map(e => `<div class="cal-evt ${e.c}">${e.t}</div>`).join('')}
+            ${overflow > 0 ? `<div class="cal-evt more">+${overflow} more</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0){ viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11){ viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    viewYear = today.getFullYear(); viewMonth = today.getMonth();
+    renderCalendar();
+  });
+
+  renderCalendar();
+</script>
+
+</body>
+</html>

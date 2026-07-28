@@ -552,6 +552,15 @@
     color:#fff;
   }
 
+  /* JS-applied "pressed/clicked" state — survives the brief delay before navigation */
+  .masters-item.is-pressed{
+    background-color:var(--blue-dark);
+    color:#fff;
+    font-weight:700;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18), 0 1px 3px rgba(37,99,235,0.35);
+    transform:translateX(1px);
+  }
+
   /* ============ MAIN CONTENT ============ */
   .main-content{
     margin-left:318px;
@@ -992,7 +1001,7 @@
     </div>
 
     <div class="col-lg-5">
-      <div class="card-base table-card h-100">
+      <div class="card-base table-card h-100" id="recent-activities">
         <div class="table-card-title">Recent Activities</div>
         <div class="activity-item">
           <div class="activity-dot"></div>
@@ -1059,11 +1068,10 @@
     dashboard: {
       title: 'Dashboard', bg:'#DBEAFE', color:'#2563EB',
       items: [
-        { name:'Overview', icon:'bi-speedometer2' },
-        { name:'KPI Dashboard', icon:'bi-bar-chart-line' },
-        { name:'Notifications', icon:'bi-bell' },
-        { name:'Calendar', icon:'bi-calendar3' },
-        { name:'Recent Activities', icon:'bi-activity' }
+        { name:'Overview', icon:'bi-speedometer2', target:'overview.html' },
+        { name:'KPI Dashboard', icon:'bi-bar-chart-line', target:'kpi-dashboard.html' },
+        { name:'Notifications', icon:'bi-bell', target:'notifications.html' },
+        { name:'Calendar', icon:'bi-calendar3', target:'calendar.html' }
       ]
     },
     masterdata: {
@@ -1077,16 +1085,13 @@
         { name:'Product Master', icon:'bi-box' },
         { name:'Bill of Materials (BOM)', icon:'bi-diagram-3' },
         { name:'Recipes / Formulas', icon:'bi-journal-text' },
-        { name:'Business Partners', icon:'bi-people' },
         { name:'Vendors', icon:'bi-truck-front' },
         { name:'Customers', icon:'bi-person-badge' },
-        { name:'Employees', icon:'bi-person-vcard' },
         { name:'Unit of Measure (UOM)', icon:'bi-rulers' },
         { name:'Tax Configuration', icon:'bi-percent' },
         { name:'Currency', icon:'bi-coin' },
         { name:'Batch Numbering', icon:'bi-hash' },
-        { name:'Document Numbering', icon:'bi-file-earmark-number' },
-        { name:'System Configuration', icon:'bi-sliders' }
+        { name:'Document Numbering', icon:'bi-file-earmark-number' }
       ]
     },
     purchasing: {
@@ -1271,9 +1276,38 @@
     const data = menuData[key];
     if(!data) return;
     panelTitle.textContent = data.title;
-    panelList.innerHTML = data.items.map(it =>
-      `<div class="masters-item"><span class="bullet" aria-hidden="true"></span><span class="label">${it.name}</span></div>`
-    ).join('');
+    // Determine current submenu item based on the page URL
+    const currentPage = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const currentPageMap = {
+      'overview.html': 'overview',
+      'kpi-dashboard.html': 'kpi-dashboard',
+      'notifications.html': 'notifications',
+      'calendar.html': 'calendar'
+    };
+    const currentSubmenu = currentPageMap[currentPage];
+
+    panelList.innerHTML = data.items.map(it => {
+      const target = it.target || '#';
+      // Mark is-selected on initial render if the URL matches
+      const isSel = currentSubmenu && target.endsWith(currentSubmenu);
+      return `<div class="masters-item${isSel ? ' is-selected' : ''}" data-target="${target}"><span class="bullet" aria-hidden="true"></span><span class="label">${it.name}</span></div>`;
+    }).join('');
+    // Wire submenu clicks to navigate with active-state feedback
+    panelList.querySelectorAll('.masters-item[data-target]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Apply on-press active feedback
+        el.classList.add('is-pressed');
+        // Mark this item as selected within the current panel
+        panelList.querySelectorAll('.masters-item').forEach(i => i.classList.remove('is-selected'));
+        el.classList.add('is-selected');
+        const t = el.getAttribute('data-target');
+        if (t && t !== '#') {
+          // Brief delay so the click/active state is visible before navigation
+          setTimeout(() => { window.location.href = t; }, 140);
+        }
+      });
+    });
   }
 
   function setMenu(key){

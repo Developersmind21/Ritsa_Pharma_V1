@@ -3,9 +3,8 @@
 ├── KPI Dashboard
 ├── Notifications
 ├── Calendar
-├── Recent Activities
 
- Master Data
+ Master 
 ├── Organization
 ├── Plants & Facilities
 ├── Warehouse
@@ -14,16 +13,14 @@
 ├── Product Master
 ├── Bill of Materials (BOM)
 ├── Recipes / Formulas
-├── Business Partners
 ├── Vendors
 ├── Customers
-├── Employees
 ├── Unit of Measure (UOM)
 ├── Tax Configuration
 ├── Currency
 ├── Batch Numbering
 ├── Document Numbering
-└── System Configuration
+
 
  Procurement
 ├── Purchase Requisition
@@ -48,7 +45,7 @@
 ├── Supplier Returns
 └── Receipt Dashboard
 
- Quality Management
+ Quality Control
 ├── Incoming Quality Inspection
 ├── Sampling
 ├── Test Requests
@@ -122,7 +119,7 @@
 ├── Dispatch Register
 └── Dispatch Dashboard
 
- Reports & Analytics
+ Reports 
 ├── Executive Dashboard
 ├── Inventory Reports
 ├── Procurement Reports
@@ -136,13 +133,6 @@
 ├── User Activity
 └── Custom Reports
 
- Workflow & Approvals
-├── Approval Inbox
-├── Pending Approvals
-├── Workflow Designer
-├── Escalation Rules
-├── Email Notifications
-└── Approval History
 
  Compliance
 ├── Audit Trail

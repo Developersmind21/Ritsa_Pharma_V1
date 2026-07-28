@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHARMA ERP - KPI Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0B1B3D;
+    --blue:#2563EB;
+    --blue-dark:#1E4FD6;
+    --page-bg:#F5F7FA;
+    --text-dark:#1F2937;
+    --text-gray:#6B7280;
+    --text-gray-light:#9CA3AF;
+    --border:#EEF1F5;
+    --green:#16A34A;
+    --red:#DC2626;
+    --purple:#7C3AED;
+    --orange:#F59E0B;
+    --teal:#0D9488;
+    --shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--page-bg);color:var(--text-dark);margin:0;overflow-x:hidden;
+  }
+  a{text-decoration:none;}
+
+  /* TOP NAVBAR */
+  .topnav{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0;position:fixed;top:0;left:0;right:0;z-index:1000;gap:14px;}
+  .side-icon-wrap{width:88px;height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:8px;}
+  .side-icon-wrap svg{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block;}
+  .hamburger-svg{width:26px !important;height:26px !important;max-width:26px !important;max-height:26px !important;}
+  .brand-logo{width:80px;height:80px;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:0;margin-top:-8px;margin-bottom:-8px;}
+  .brand-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+  .nav-spacer{flex:1;padding-right:18px;}
+  .nav-icon-item{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer;color:var(--text-dark);min-width:44px;}
+  .nav-icon-item.no-cursor{cursor:pointer;}
+  .nav-icon-item i{font-size:0.98rem;color:#4B5563;}
+  .nav-icon-item > span{font-size:0.58rem;color:var(--text-gray);font-weight:500;}
+
+  .notif-dropdown{position:absolute;top:calc(100% + 12px);right:0;width:340px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:1100;display:none;flex-direction:column;overflow:hidden;}
+  .notif-dropdown.open{display:flex;}
+  .notif-dropdown::before{content:"";position:absolute;top:-7px;right:18px;width:12px;height:12px;background:#fff;border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg);}
+  .notif-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:#F8FAFC;}
+  .notif-header-title{font-size:0.82rem;font-weight:700;color:var(--text-dark);display:flex;align-items:center;gap:6px;}
+  .notif-header-title .count-badge{background:var(--red);color:#fff;font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:10px;line-height:1.3;}
+  .notif-mark-all{font-size:0.68rem;color:var(--blue);font-weight:600;cursor:pointer;}
+  .notif-list{max-height:360px;overflow-y:auto;}
+  .notif-item{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color 140ms ease;position:relative;}
+  .notif-item:hover{background:#F8FAFC;}
+  .notif-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;color:#fff;flex-shrink:0;}
+  .notif-icon-red{background:#DC2626;}
+  .notif-icon-orange{background:#F59E0B;}
+  .notif-icon-blue{background:#2563EB;}
+  .notif-body{flex:1;min-width:0;}
+  .notif-title{font-size:0.76rem;font-weight:700;color:var(--text-dark);line-height:1.3;margin-bottom:2px;}
+  .notif-desc{font-size:0.7rem;color:var(--text-gray);line-height:1.35;}
+  .notif-time{font-size:0.62rem;color:var(--text-gray-light);margin-top:3px;display:block;}
+  .notif-unread-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);position:absolute;top:14px;right:14px;flex-shrink:0;}
+  .notif-footer{padding:9px 14px;text-align:center;border-top:1px solid var(--border);background:#F8FAFC;}
+  .notif-footer a{font-size:0.72rem;font-weight:600;color:var(--blue);}
+  .nav-badge{position:absolute;top:-4px;right:6px;background:var(--red);color:#fff !important;font-size:0.68rem;font-weight:700;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;}
+
+  .profile-block{display:flex;align-items:center;gap:8px;cursor:pointer;padding-left:12px;border-left:1px solid var(--border);margin-left:4px;position:relative;}
+  .profile-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;overflow:hidden;}
+  .profile-avatar svg{width:100%;height:100%;display:block;}
+  .profile-info{display:flex;flex-direction:column;gap:3px;line-height:1.15;}
+  .profile-name{font-size:0.76rem;font-weight:700;color:var(--text-dark);line-height:1.15;margin:0;}
+  .profile-role{font-size:0.62rem;color:var(--text-gray);line-height:1.15;margin:0;}
+  .profile-dropdown{position:absolute;top:calc(100% + 10px);right:0;width:190px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);padding:6px;display:none;flex-direction:column;z-index:1100;}
+  .profile-dropdown.open{display:flex;}
+  .profile-dd-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;font-size:0.78rem;font-weight:500;color:var(--text-dark);}
+  .profile-dd-item i{font-size:0.9rem;color:var(--text-gray);width:16px;}
+  .profile-dd-item:hover{background:var(--page-bg);}
+  .profile-dd-divider{height:1px;background:var(--border);margin:5px 2px;}
+  .profile-dd-danger{color:var(--red);}
+  .profile-dd-danger i{color:var(--red);}
+
+  /* ICON SIDEBAR */
+  .icon-sidebar{position:fixed;top:0;bottom:0;left:0;width:88px;background:var(--navy);display:flex;flex-direction:column;align-items:stretch;padding-top:68px;z-index:905;overflow:hidden;}
+  .sb-item{flex:0 0 auto;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 4px;color:#AEB8D6;cursor:pointer;text-align:center;position:relative;}
+  .sb-item i{font-size:1.05rem;}
+  .sb-item span{font-size:0.6rem;font-weight:600;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;hyphens:auto;padding:0 2px;width:100%;}
+  .sb-item:hover{color:#fff;}
+  .sb-item.active{color:#fff;}
+  .sb-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--blue);border-radius:0 4px 4px 0;}
+  .sb-item.active .sb-icon-wrap{background:var(--blue);border-radius:8px;}
+  .sb-icon-wrap{width:30px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+
+  /* SUBMENU FLYOUT */
+  .masters-panel{position:fixed;top:64px;bottom:0;left:88px;width:230px;background:linear-gradient(180deg,#FBFCFE 0%,#F8FAFC 100%);border-right:1px solid #E5E9F0;box-shadow:1px 0 0 rgba(255,255,255,1) inset,2px 0 18px rgba(15,23,42,0.04),8px 0 28px rgba(15,23,42,0.03);z-index:850;display:flex;flex-direction:column;}
+  .masters-header{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;border-bottom:1px solid #ECEEF3;margin-bottom:6px;background:linear-gradient(180deg,rgba(255,255,255,0.6) 0%,rgba(255,255,255,0) 100%);}
+  .masters-header h6{margin:0;font-weight:800;font-size:0.78rem;color:#000;letter-spacing:0.3px;}
+  .masters-list{overflow:visible;padding:6px 6px 16px;flex:1 1 auto;}
+  .masters-item{position:relative;display:flex;align-items:center;gap:0;padding:9px 10px 9px 12px;margin:0;color:#0F172A;font-size:0.78rem;font-weight:500;line-height:1.35;cursor:pointer;overflow:hidden;border-radius:6px;border-bottom:none;background-color:transparent;transition:background-color 140ms ease,color 140ms ease,box-shadow 140ms ease,padding-left 140ms ease,font-weight 140ms ease;}
+  .masters-item span,.masters-item .label{white-space:normal;overflow:visible;text-overflow:clip;flex:1 1 auto;min-width:0;word-break:break-word;line-height:1.35;display:block;}
+  .masters-item:hover{background-color:var(--blue);color:#fff;font-weight:700;box-shadow:0 1px 2px rgba(37,99,235,0.18);padding-left:14px;}
+  .masters-item:active{background-color:var(--blue-dark);color:#fff;font-weight:700;}
+  .masters-item.is-selected{background-color:var(--blue);color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12);}
+  .masters-item.is-selected:hover{background-color:var(--blue-dark);color:#fff;}
+
+  /* MAIN CONTENT */
+  .main-content{margin-left:318px;margin-right:0;margin-top:64px;padding:14px 20px 16px;min-height:calc(100vh - 64px);}
+
+  .greet-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .greet-sub{font-size:0.76rem;color:var(--text-gray);margin-bottom:2px;}
+  .greet-title{font-size:1.3rem;font-weight:800;color:var(--text-dark);margin-bottom:2px;}
+  .greet-desc{font-size:0.76rem;color:var(--text-gray);}
+
+  .card-base{background:#fff;border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+  .btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text-dark);font-weight:600;font-size:0.74rem;padding:6px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;}
+  .btn-ghost:hover{background:var(--page-bg);border-color:#D1D5DB;}
+  .btn-customize{background:var(--blue);border:none;color:#fff;font-weight:600;font-size:0.76rem;padding:7px 14px;border-radius:8px;display:flex;align-items:center;gap:6px;}
+  .btn-customize:hover{background:var(--blue-dark);color:#fff;}
+
+  .filter-dd{font-size:0.68rem;color:var(--text-dark);font-weight:500;background:var(--page-bg);border:1px solid var(--border);padding:5px 10px;border-radius:7px;display:flex;align-items:center;gap:5px;}
+  .filter-tabs{display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px;}
+  .filter-tab{font-size:0.7rem;font-weight:600;color:var(--text-gray);padding:5px 10px;border-radius:6px;cursor:pointer;border:none;background:transparent;}
+  .filter-tab.active{background:var(--blue);color:#fff;}
+
+  /* KPI Module Group */
+  .module-group{margin-bottom:14px;}
+  .module-head{
+    display:flex;align-items:center;gap:9px;
+    margin-bottom:8px;padding:0 2px;
+  }
+  .module-icon{
+    width:26px;height:26px;border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:0.82rem;flex-shrink:0;
+  }
+  .module-name{font-size:0.82rem;font-weight:800;color:var(--text-dark);line-height:1.1;}
+  .module-sub{font-size:0.62rem;color:var(--text-gray);font-weight:500;}
+
+  /* KPI Tile */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+  .kpi-tile{
+    background:#fff;border:1px solid var(--border);border-radius:10px;
+    padding:11px 12px;display:flex;flex-direction:column;gap:4px;
+    transition:box-shadow 140ms ease, transform 140ms ease;
+    position:relative;
+  }
+  .kpi-tile:hover{box-shadow:0 4px 14px rgba(15,23,42,0.06);transform:translateY(-1px);}
+  .kpi-label{font-size:0.66rem;color:var(--text-gray);font-weight:600;line-height:1.2;}
+  .kpi-row{display:flex;align-items:baseline;gap:6px;}
+  .kpi-value{font-size:1.1rem;font-weight:800;color:var(--text-dark);line-height:1.1;}
+  .kpi-unit{font-size:0.62rem;color:var(--text-gray);font-weight:600;}
+  .kpi-delta{font-size:0.62rem;font-weight:700;display:inline-flex;align-items:center;gap:2px;}
+  .kpi-delta.up{color:var(--green);}
+  .kpi-delta.down{color:var(--red);}
+  .kpi-delta.flat{color:var(--text-gray);}
+  .kpi-foot{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:4px;font-size:0.6rem;color:var(--text-gray);
+    border-top:1px dashed var(--border);padding-top:5px;
+  }
+  .kpi-spark{width:54px;height:18px;flex-shrink:0;}
+  .kpi-target{font-size:0.6rem;color:var(--text-gray);font-weight:600;}
+  .kpi-target b{color:var(--text-dark);font-weight:700;}
+
+  /* trend pill */
+  .tier-pill{
+    font-size:0.58rem;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
+    padding:1px 6px;border-radius:10px;
+  }
+  .tier-pill.ops{background:#DBEAFE;color:#1D4ED8;}
+  .tier-pill.biz{background:#FEF3C7;color:#92400E;}
+  .tier-pill.exec{background:#FEE2E2;color:#991B1B;}
+
+  /* module color */
+  .bg-blue-soft{background:#2563EB;}
+  .bg-green-soft{background:#16A34A;}
+  .bg-purple-soft{background:#7C3AED;}
+  .bg-orange-soft{background:#F59E0B;}
+  .bg-red-soft{background:#DC2626;}
+  .bg-teal-soft{background:#0D9488;}
+  .bg-navy-soft{background:#0B1B3D;}
+
+  /* responsive */
+  @media (max-width:1399px){.kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media (max-width:1199px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  @media (max-width:991px){
+    .masters-panel{transform:translateX(-12px);opacity:0;visibility:hidden;pointer-events:none;}
+    .masters-panel.open{transform:translateX(0);opacity:1;visibility:visible;pointer-events:auto;}
+    .main-content{margin-left:88px;}
+    .main-content.panel-open{margin-left:318px;}
+  }
+  @media (max-width:767px){
+    .icon-sidebar{display:none;}
+    .side-icon-wrap{display:none;}
+    .main-content{margin-left:0;padding:14px;}
+    .kpi-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="topnav">
+  <div class="side-icon-wrap">
+    <svg class="hamburger-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Menu">
+      <line x1="4" y1="7"  x2="20" y2="7"  stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="12" x2="20" y2="12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+      <line x1="4" y1="17" x2="20" y2="17" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="brand-logo">
+    <img src="assets/image (21).png" alt="Pharma ERP Logo">
+  </div>
+  <div class="nav-spacer"></div>
+
+  <div class="d-flex align-items-center gap-1">
+    <div class="nav-icon-item" id="notifBell">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+      <span class="nav-badge" id="notifBadge">3</span>
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <div class="notif-header-title">Notifications <span class="count-badge" id="notifCountBadge">3 New</span></div>
+          <div class="notif-mark-all" id="notifMarkAll">Mark all read</div>
+        </div>
+        <div class="notif-list" id="notifList">
+          <div class="notif-item" data-id="n1">
+            <div class="notif-icon notif-icon-red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">Batch B240601 - QC Test Failed</div>
+              <div class="notif-desc">Paracetamol 500mg batch has failed the assay test.</div>
+              <span class="notif-time">10 mins ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-item" data-id="n2">
+            <div class="notif-icon notif-icon-orange"><i class="bi bi-calendar-x-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">Near-Expiry Stock Alert</div>
+              <div class="notif-desc">42 batches of Amoxicillin 250mg will expire within 30 days.</div>
+              <span class="notif-time">1 hour ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-item" data-id="n3">
+            <div class="notif-icon notif-icon-blue"><i class="bi bi-cart-check-fill"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">PO-2024-00125 - Pending Approval</div>
+              <div class="notif-desc">Purchase order from MedChem Laboratories (₹4,82,500) is awaiting your sign-off.</div>
+              <span class="notif-time">2 hours ago</span>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+        </div>
+        <div class="notif-footer"><a href="#">View All Notifications</a></div>
+      </div>
+    </div>
+    <div class="nav-icon-item no-cursor">
+      <i class="bi bi-question-circle"></i>
+      <span>Help</span>
+    </div>
+  </div>
+
+  <div class="profile-block" id="profileBlock">
+    <div class="profile-avatar" aria-label="Shailendra Singh">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="paBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#DBEAFE"/><stop offset="100%" stop-color="#93C5FD"/></linearGradient></defs>
+        <circle cx="16" cy="16" r="16" fill="url(#paBg)"/>
+        <circle cx="16" cy="12" r="5" fill="#1E40AF"/>
+        <path d="M5 28 C 5 22, 9.5 19, 16 19 C 22.5 19, 27 22, 27 28 L 27 32 L 5 32 Z" fill="#1E40AF"/>
+      </svg>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name">Shailendra Singh</div>
+      <div class="profile-role">Chief Operating Officer</div>
+    </div>
+    <i class="bi bi-chevron-down" style="font-size:0.7rem;color:var(--text-gray);"></i>
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="#" class="profile-dd-item"><i class="bi bi-person-circle"></i> My Account</a>
+      <div class="profile-dd-divider"></div>
+      <a href="#" class="profile-dd-item profile-dd-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- LEFT ICON SIDEBAR -->
+<div class="icon-sidebar" id="iconSidebar">
+  <div class="sb-item active" data-menu="dashboard"><div class="sb-icon-wrap"><i class="bi bi-house-door-fill"></i></div><span>Dashboard</span></div>
+  <div class="sb-item" data-menu="masterdata"><div class="sb-icon-wrap"><i class="bi bi-diagram-3"></i></div><span>Masters</span></div>
+  <div class="sb-item" data-menu="purchasing"><div class="sb-icon-wrap"><i class="bi bi-cart3"></i></div><span>Procurement</span></div>
+  <div class="sb-item" data-menu="goodsreceipt"><div class="sb-icon-wrap"><i class="bi bi-box-arrow-in-down"></i></div><span>Goods Receipt</span></div>
+  <div class="sb-item" data-menu="qualitymgmt"><div class="sb-icon-wrap"><i class="bi bi-patch-check"></i></div><span>Quality Control</span></div>
+  <div class="sb-item" data-menu="production"><div class="sb-icon-wrap"><i class="bi bi-gear-wide-connected"></i></div><span>Production</span></div>
+  <div class="sb-item" data-menu="warehouse"><div class="sb-icon-wrap"><i class="bi bi-building"></i></div><span>Warehouse</span></div>
+  <div class="sb-item" data-menu="finishedgoods"><div class="sb-icon-wrap"><i class="bi bi-box-seam"></i></div><span>Finished Goods</span></div>
+  <div class="sb-item" data-menu="salesdispatch"><div class="sb-icon-wrap"><i class="bi bi-truck"></i></div><span>Sales &amp; Dispatch</span></div>
+  <div class="sb-item" data-menu="reports"><div class="sb-icon-wrap"><i class="bi bi-bar-chart-line"></i></div><span>Reports</span></div>
+  <div class="sb-item" data-menu="compliance"><div class="sb-icon-wrap"><i class="bi bi-shield-check"></i></div><span>Compliance</span></div>
+  <div class="sb-item" data-menu="admin"><div class="sb-icon-wrap"><i class="bi bi-person-gear"></i></div><span>Administration</span></div>
+</div>
+
+<!-- SUBMENU FLYOUT -->
+<div class="masters-panel open" id="mastersPanel">
+  <div class="masters-header"><h6 id="panelTitle">Dashboard</h6></div>
+  <div class="masters-list" id="panelList"></div>
+</div>
+
+<!-- MAIN CONTENT — KPI DASHBOARD -->
+<div class="main-content panel-open" id="mainContent">
+
+  <div class="greet-row">
+    <div>
+      <div class="greet-sub">Welcome back, Shailendra Singh</div>
+      <div class="greet-title">KPI Dashboard</div>
+      <div class="greet-desc">Operational &amp; Business KPIs across the pharma value chain — modular, period-filtered.</div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <div class="filter-tabs" id="periodTabs">
+        <button class="filter-tab" data-period="today">Today</button>
+        <button class="filter-tab" data-period="week">Week</button>
+        <button class="filter-tab active" data-period="month">Month</button>
+        <button class="filter-tab" data-period="quarter">Quarter</button>
+        <button class="filter-tab" data-period="year">Year</button>
+      </div>
+      <button class="btn-ghost"><i class="bi bi-download"></i> Export</button>
+      <button class="btn-customize"><i class="bi bi-sliders"></i> Customize</button>
+    </div>
+  </div>
+
+  <!-- ============ PROCUREMENT ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-blue-soft"><i class="bi bi-cart3"></i></div>
+      <div>
+        <div class="module-name">Procurement</div>
+        <div class="module-sub">4 KPIs · Source: Procurement / Goods Receipt</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">PO Cycle Time <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">3.2</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>3.0d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.4d</span><canvas class="kpi-spark" id="sp-poCycle" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Vendor On-Time Delivery <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">91.2</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>95%</b></span><span class="kpi-delta up"><i class="bi bi-arrow-up"></i> 1.4%</span><canvas class="kpi-spark" id="sp-otd" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Three-Way Match Exception <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">4.8</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; 3%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.6%</span><canvas class="kpi-spark" id="sp-3wm" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Vendor Rejection Rate <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">2.1</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; 2%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.3%</span><canvas class="kpi-spark" id="sp-vrr" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GOODS RECEIPT ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-green-soft"><i class="bi bi-box-arrow-in-down"></i></div>
+      <div>
+        <div class="module-name">Goods Receipt</div>
+        <div class="module-sub">1 KPI · Source: Goods Receipt / Quality Control</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">GRN → Quarantine Release Cycle <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">2.4</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>2.0d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.2d</span><canvas class="kpi-spark" id="sp-grnCycle" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ QUALITY CONTROL ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-red-soft"><i class="bi bi-patch-check"></i></div>
+      <div>
+        <div class="module-name">Quality Control</div>
+        <div class="module-sub">5 KPIs · Source: Quality Control</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">Right-First-Time (RFT) <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">96.8</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>97%</b></span><span class="kpi-delta up"><i class="bi bi-arrow-up"></i> 0.6%</span><canvas class="kpi-spark" id="sp-rft" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">OOS / OOT Incidence <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">1.4</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; 1%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.2%</span><canvas class="kpi-spark" id="sp-oos" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Batch Release Cycle Time <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">5.6</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>5.0d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.4d</span><canvas class="kpi-spark" id="sp-brct" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Deviation / CAPA Closure <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">82</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>90%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-down"></i> 3%</span><canvas class="kpi-spark" id="sp-capa" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">CAPA Aging (avg open) <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">14</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>10d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 2d</span><canvas class="kpi-spark" id="sp-capaAge" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PRODUCTION ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-purple-soft"><i class="bi bi-gear-wide-connected"></i></div>
+      <div>
+        <div class="module-name">Production</div>
+        <div class="module-sub">4 KPIs · Source: Production</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">Yield Variance <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">+1.2</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>±2%</b></span><span class="kpi-delta up"><i class="bi bi-check2"></i> Within</span><canvas class="kpi-spark" id="sp-yield" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Line / Machine Utilization <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">78.4</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>85%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-down"></i> 1.2%</span><canvas class="kpi-spark" id="sp-util" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Rework / Scrap Cost Ratio <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">2.8</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; 2.5%</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.3%</span><canvas class="kpi-spark" id="sp-rework" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Line Clearance Compliance <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">98.6</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>100%</b></span><span class="kpi-delta flat"><i class="bi bi-dash"></i> Flat</span><canvas class="kpi-spark" id="sp-lc" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WAREHOUSE ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-teal-soft"><i class="bi bi-building"></i></div>
+      <div>
+        <div class="module-name">Warehouse</div>
+        <div class="module-sub">4 KPIs · Source: Warehouse</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">Inventory Accuracy <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">98.4</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>99%</b></span><span class="kpi-delta up"><i class="bi bi-arrow-up"></i> 0.4%</span><canvas class="kpi-spark" id="sp-invAcc" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Inventory Turnover <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">5.8</div><div class="kpi-unit">x</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>6.0x</b></span><span class="kpi-delta up"><i class="bi bi-arrow-up"></i> 0.2x</span><canvas class="kpi-spark" id="sp-invTurn" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Near-Expiry Stock Value <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">₹18.4</div><div class="kpi-unit">L</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; ₹15L</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 1.2L</span><canvas class="kpi-spark" id="sp-nes" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">FEFO / FIFO Compliance <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">99.1</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>100%</b></span><span class="kpi-delta flat"><i class="bi bi-dash"></i> Flat</span><canvas class="kpi-spark" id="sp-fefo" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FINISHED GOODS ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-orange-soft"><i class="bi bi-box-seam"></i></div>
+      <div>
+        <div class="module-name">Finished Goods</div>
+        <div class="module-sub">1 KPI · Source: Finished Goods</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">Product Release Cycle Time <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">1.2</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>1.0d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.1d</span><canvas class="kpi-spark" id="sp-prct" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SALES & DISPATCH ============ -->
+  <div class="module-group">
+    <div class="module-head">
+      <div class="module-icon bg-orange-soft"><i class="bi bi-truck"></i></div>
+      <div>
+        <div class="module-name">Sales &amp; Dispatch</div>
+        <div class="module-sub">3 KPIs · Source: Sales &amp; Dispatch</div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-tile">
+        <div class="kpi-label">OTIF (On-Time-In-Full) <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">92.4</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>95%</b></span><span class="kpi-delta up"><i class="bi bi-arrow-up"></i> 2.1%</span><canvas class="kpi-spark" id="sp-otif" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Order Fulfillment Cycle <span class="tier-pill ops">Ops</span></div>
+        <div class="kpi-row"><div class="kpi-value">2.8</div><div class="kpi-unit">days</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>2.5d</b></span><span class="kpi-delta down"><i class="bi bi-arrow-up"></i> 0.2d</span><canvas class="kpi-spark" id="sp-ofc" width="54" height="18"></canvas></div>
+      </div>
+      <div class="kpi-tile">
+        <div class="kpi-label">Customer Return Rate <span class="tier-pill biz">Biz</span></div>
+        <div class="kpi-row"><div class="kpi-value">1.6</div><div class="kpi-unit">%</div></div>
+        <div class="kpi-foot"><span class="kpi-target">Target: <b>&lt; 1.5%</b></span><span class="kpi-delta up"><i class="bi bi-arrow-down"></i> 0.2%</span><canvas class="kpi-spark" id="sp-crr" width="54" height="18"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============ MENU DATA (Dashboard submenu only) ============
+  const menuData = {
+    dashboard: {
+      title:'Dashboard',
+      items:[
+        { name:'Overview', icon:'bi-speedometer2', target:'overview.html' },
+        { name:'KPI Dashboard', icon:'bi-bar-chart-line', target:'kpi-dashboard.html' },
+        { name:'Notifications', icon:'bi-bell', target:'notifications.html' },
+        { name:'Calendar', icon:'bi-calendar3', target:'calendar.html' }
+      ]
+    }
+  };
+
+  const mastersPanel = document.getElementById('mastersPanel');
+  const mainContent = document.getElementById('mainContent');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelList = document.getElementById('panelList');
+  const sbItems = document.querySelectorAll('.sb-item[data-menu]');
+
+  // Determine which submenu item is the current page
+  const currentPage = (window.location.pathname.split('/').pop() || 'kpi-dashboard.html').toLowerCase();
+  const currentPageMap = {
+    'overview.html': 'overview',
+    'kpi-dashboard.html': 'kpi-dashboard',
+    'notifications.html': 'notifications',
+    'calendar.html': 'calendar',
+    'index.html': 'recent-activities'
+  };
+  const currentSubmenu = currentPageMap[currentPage] || 'kpi-dashboard';
+
+  function renderPanel(key){
+    const data = menuData[key];
+    if(!data) return;
+    panelTitle.textContent = data.title;
+    panelList.innerHTML = data.items.map(it => {
+      const target = it.target || '#';
+      return `<div class="masters-item" data-target="${target}"><span class="label">${it.name}</span></div>`;
+    }).join('');
+    // Mark the current page as selected
+    const selected = panelList.querySelector(`[data-target$="${currentSubmenu}"]`);
+    if (selected) selected.classList.add('is-selected');
+    // Wire submenu clicks to navigate with active-state feedback
+    panelList.querySelectorAll('.masters-item[data-target]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // On-press visual feedback
+        el.classList.add('is-pressed');
+        // Mark this item as selected within the current panel
+        panelList.querySelectorAll('.masters-item').forEach(i => i.classList.remove('is-selected'));
+        el.classList.add('is-selected');
+        const t = el.getAttribute('data-target');
+        if (t && t !== '#') {
+          // Brief delay so the click/active state is visible before navigation
+          setTimeout(() => { window.location.href = t; }, 140);
+        }
+      });
+    });
+  }
+
+  sbItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      const key = item.getAttribute('data-menu');
+      if (key !== 'dashboard') {
+        // Route back to index.html for non-Dashboard menus
+        window.location.href = 'index.html#' + key;
+        return;
+      }
+      renderPanel(key);
+    });
+  });
+
+  renderPanel('dashboard');
+
+  // ============ PROFILE ============
+  const profileBlock = document.getElementById('profileBlock');
+  const profileDropdown = document.getElementById('profileDropdown');
+  profileBlock.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('open'); });
+  document.addEventListener('click', () => profileDropdown.classList.remove('open'));
+  profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+  // ============ NOTIFICATIONS ============
+  const notifBell = document.getElementById('notifBell');
+  const notifDropdown = document.getElementById('notifDropdown');
+  const notifBadge = document.getElementById('notifBadge');
+  const notifCountBadge = document.getElementById('notifCountBadge');
+  const notifMarkAll = document.getElementById('notifMarkAll');
+  const notifItems = document.querySelectorAll('.notif-item');
+
+  notifBell.addEventListener('click', (e) => { e.stopPropagation(); notifDropdown.classList.toggle('open'); profileDropdown.classList.remove('open'); });
+  notifDropdown.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => notifDropdown.classList.remove('open'));
+
+  notifItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const dot = item.querySelector('.notif-unread-dot'); if (dot) dot.remove();
+      updateUnreadCount();
+    });
+  });
+  notifMarkAll.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notifItems.forEach(item => { const dot = item.querySelector('.notif-unread-dot'); if (dot) dot.remove(); });
+    updateUnreadCount();
+  });
+  function updateUnreadCount(){
+    const remaining = document.querySelectorAll('.notif-item .notif-unread-dot').length;
+    if (remaining <= 0){
+      notifBadge.style.display = 'none';
+      notifCountBadge.textContent = '0 New';
+      notifCountBadge.style.background = '#94A3B8';
+    } else {
+      notifBadge.style.display = 'flex';
+      notifBadge.textContent = remaining;
+      notifCountBadge.textContent = remaining + ' New';
+      notifCountBadge.style.background = '';
+    }
+  }
+
+  // ============ PERIOD TABS (no-op stub — UI state only) ============
+  document.querySelectorAll('#periodTabs .filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#periodTabs .filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // ============ KPI SPARKLINES (deterministic, minimal) ============
+  function spark(canvasId, color, data){
+    const c = document.getElementById(canvasId);
+    if(!c) return;
+    new Chart(c.getContext('2d'), {
+      type:'line',
+      data:{ labels:data.map((_,i)=>i), datasets:[{
+        data, borderColor:color, backgroundColor:color+'22',
+        borderWidth:1.4, fill:true, tension:0.35, pointRadius:0
+      }]},
+      options:{
+        responsive:false, animation:false,
+        plugins:{ legend:{display:false}, tooltip:{enabled:false} },
+        scales:{ x:{display:false}, y:{display:false} }
+      }
+    });
+  }
+
+  // Procurement
+  spark('sp-poCycle','#2563EB',[2.8,2.9,3.0,3.1,3.0,3.2]);
+  spark('sp-otd',    '#16A34A',[88,89,90,90.5,90,91.2]);
+  spark('sp-3wm',    '#DC2626',[3.5,3.8,4.0,4.2,4.5,4.8]);
+  spark('sp-vrr',    '#DC2626',[1.5,1.6,1.7,1.8,1.9,2.1]);
+  // Goods Receipt
+  spark('sp-grnCycle','#F59E0B',[2.0,2.1,2.2,2.3,2.3,2.4]);
+  // Quality
+  spark('sp-rft',    '#16A34A',[95.5,95.8,96.0,96.2,96.5,96.8]);
+  spark('sp-oos',    '#DC2626',[1.0,1.1,1.2,1.2,1.3,1.4]);
+  spark('sp-brct',   '#F59E0B',[5.0,5.1,5.2,5.3,5.4,5.6]);
+  spark('sp-capa',   '#DC2626',[88,86,85,84,83,82]);
+  spark('sp-capaAge','#F59E0B',[10,11,12,12,13,14]);
+  // Production
+  spark('sp-yield',  '#16A34A',[0.8,0.9,1.0,1.0,1.1,1.2]);
+  spark('sp-util',   '#2563EB',[80,79,78.5,79,78.5,78.4]);
+  spark('sp-rework', '#DC2626',[2.3,2.4,2.5,2.6,2.7,2.8]);
+  spark('sp-lc',     '#16A34A',[98.2,98.3,98.4,98.5,98.5,98.6]);
+  // Warehouse
+  spark('sp-invAcc', '#16A34A',[97.5,97.8,98.0,98.1,98.3,98.4]);
+  spark('sp-invTurn','#2563EB',[5.4,5.5,5.6,5.7,5.7,5.8]);
+  spark('sp-nes',    '#DC2626',[16,16.5,17,17.5,18,18.4]);
+  spark('sp-fefo',   '#16A34A',[99,99,99.1,99.1,99.1,99.1]);
+  // Finished Goods
+  spark('sp-prct',   '#F59E0B',[1.0,1.0,1.1,1.1,1.2,1.2]);
+  // Sales & Dispatch
+  spark('sp-otif',   '#2563EB',[88,89,90,91,92,92.4]);
+  spark('sp-ofc',    '#F59E0B',[2.4,2.5,2.5,2.6,2.7,2.8]);
+  spark('sp-crr',    '#16A34A',[2.0,1.9,1.8,1.8,1.7,1.6]);
+</script>
+
+</body>
+</html>
